@@ -15,7 +15,7 @@ export class HttpRequest {
   source: CancelTokenSource;
 
   constructor(path: string) {
-    this.$apiKey = process.env.NEXT_PUBLIC_CLIENT_ID!;
+    this.$apiKey = process.env.NEXT_PUBLIC_CLIENT_URL!;
     this.$api = $AuthApi;
     this.path = path;
     this.cancelToken = axios.CancelToken;

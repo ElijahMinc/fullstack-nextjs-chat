@@ -17,5 +17,9 @@ export const getQueryParams = (inputParams: Partial<any>): string => {
       params.append(key, String(value));
     });
 
+  if (params.toString() === '?') {
+    return '';
+  }
+
   return !!params.has.length ? `?${params.toString()}` : '';
 };

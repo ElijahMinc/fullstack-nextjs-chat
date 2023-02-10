@@ -11,9 +11,8 @@ class CrudService {
   protected async getAll<T>(params: any, route?: string): Promise<any> {
     const routeParams = getQueryParams({
       ...params,
-      client_id: this.httpRequest.$apiKey,
     });
-
+    console.log('routeParams', { routeParams, route });
     return await this.httpRequest.get<T>(routeParams, route);
   }
 

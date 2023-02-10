@@ -1,1 +1,1 @@
-export { default as ImageService } from './ImageService';
+export { default as ImageService } from './AuthService';

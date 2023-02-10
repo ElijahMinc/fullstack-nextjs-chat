@@ -1,9 +1,6 @@
 import { useRouter } from 'next/router';
-import { useState } from 'react';
 import Avatar from '@mui/material/Avatar';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
@@ -13,25 +10,38 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Nature from '@/public/nature.jpg';
 import { useFormik } from 'formik';
+import AuthService from '@/services/AuthService';
 
 enum AuthType {
   LOGIN = 'login',
   REGISTER = 'register',
 }
 
-const Auth = () => {
+const Auth = ({ setIsAuth }: { setIsAuth: () => void }) => {
   const router = useRouter();
   const isRegisterTypePage = router.query?.type === AuthType.REGISTER;
-
-  console.log('isRegisterTypePage', isRegisterTypePage);
 
   const { handleChange, handleSubmit } = useFormik({
     initialValues: {
       email: '',
       password: '',
     },
-    onSubmit: (values: any) => {
-      console.log('values', values);
+    onSubmit: async ({ email, password }) => {
+      let response;
+
+      if (isRegisterTypePage) {
+        response = await AuthService.registration(email, password);
+      } else {
+        response = await AuthService.login(email, password);
+      }
+
+      if (!response) return;
+
+      setIsAuth();
+
+      router.push({
+        pathname: '/',
+      });
     },
   });
 
@@ -133,27 +143,21 @@ const Auth = () => {
                 id="password"
                 autoComplete="current-password"
               />
-              {/* <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
-              /> */}
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
               >
-                Sign In
+                Sign {isRegisterTypePage ? 'up' : 'in'}
               </Button>
+
               <Grid container>
-                {/* <Grid item xs>
-                  <Link href="#" variant="body2">
-                    Forgot password?
-                  </Link>
-                </Grid> */}
                 <Grid item>
                   <Link href="#" variant="body2" onClick={toggleType}>
-                    {"Don't have an account? Sign Up"}
+                    {isRegisterTypePage
+                      ? "Don't have an account? Sign Up"
+                      : 'Do you have an account? Sign In'}
                   </Link>
                 </Grid>
               </Grid>

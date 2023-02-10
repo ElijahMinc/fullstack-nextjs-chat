@@ -24,7 +24,6 @@ a {
 
 .lds-roller {
   display: block;
-  position: relative;
   width: 80px;
   height: 80px;
   margin: 0 auto;
@@ -40,7 +39,7 @@ a {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #fff;
+  background: #488cc3;
   margin: -4px 0 0 -4px;
 }
 .lds-roller div:nth-child(1) {
