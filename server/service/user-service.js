@@ -76,8 +76,6 @@ class UserService {
     const userData = tokenService.validateRefreshToken(refreshToken);
 
     const tokenFromDb = await tokenService.findToken(refreshToken);
-    console.log('userData', userData);
-    console.log('tokenFromDb', tokenFromDb);
     if (!userData || !tokenFromDb) {
       throw ApiError.UnauthorizedError();
     }
@@ -95,6 +93,11 @@ class UserService {
   async getAllUsers() {
     const users = await UserModel.find();
     return users;
+  }
+
+  async getUserById(id) {
+    const user = await UserModel.findById(id);
+    return user;
   }
 }
 

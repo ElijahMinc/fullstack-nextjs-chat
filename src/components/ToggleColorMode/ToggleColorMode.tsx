@@ -6,8 +6,9 @@ import styled from '@emotion/styled';
 
 const ColorModeContainerButton = styled('div')(({ theme }) => ({
   position: 'fixed',
-  right: '50px',
-  top: '50px',
+  right: '25px',
+  top: '15px',
+  zIndex: 2000,
 }));
 
 export const ToggleColorMode = () => {

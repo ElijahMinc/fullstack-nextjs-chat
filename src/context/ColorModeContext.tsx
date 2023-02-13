@@ -17,6 +17,7 @@ export interface ThemedProviderProps {
 const getDesignTokens = (mode: PaletteMode) => ({
   palette: {
     mode,
+
     ...(mode === 'light'
       ? {
           // palette values for light mode

@@ -17,6 +17,21 @@ body > div {
   height: 100%;
 }
 
+/* *::-webkit-scrollbar {
+  width: 5px; 
+}
+
+*::-webkit-scrollbar-track {
+  background: rgb(83, 81, 81); 
+  border-radius: 10px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgb(33, 33, 138);   
+  border-radius: 20px;       
+
+} */
+
 a {
   color: inherit;
   text-decoration: none;

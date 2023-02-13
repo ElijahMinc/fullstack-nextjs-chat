@@ -22,7 +22,7 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
         bgcolor: 'background.default',
         color: 'text.primary',
         p: 3,
-        height: '100%',
+        height: '100%', // broken template in the chat page with that
       }}
     >
       <main

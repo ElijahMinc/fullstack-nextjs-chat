@@ -12,7 +12,6 @@ class CrudService {
     const routeParams = getQueryParams({
       ...params,
     });
-    console.log('routeParams', { routeParams, route });
     return await this.httpRequest.get<T>(routeParams, route);
   }
 
