@@ -3,6 +3,7 @@ import { styled } from '@mui/material';
 import { MessageLeft, MessageRight } from '@/common/Message/Message';
 import { Nullable } from '@/types/Nullable';
 import { Message } from '@/types/message';
+import { getDataFromCurrentMoment } from '@/utils/getDataFromCurrentMoment';
 
 const MessageBody = styled('div')(({ theme }) => ({
   width: 'calc( 100% - 20px )',
@@ -48,7 +49,7 @@ export const Messages: React.FC<MessagesProps> = ({
           {message.senderId === currentUserId ? (
             <MessageRight
               message={message.text}
-              timestamp="MM/DD 00:00"
+              timestamp={getDataFromCurrentMoment(message.createdAt)}
               // photoURL="https://lh3.googleusercontent.com/a-/AOh14Gi4vkKYlfrbJ0QLJTg_DLjcYyyK7fYoWRpz2r4s=s96-c"
               // displayName="まさりぶ"
               // avatarDisp={true}
@@ -56,7 +57,7 @@ export const Messages: React.FC<MessagesProps> = ({
           ) : (
             <MessageLeft
               message={message.text}
-              timestamp="MM/DD 00:00"
+              timestamp={getDataFromCurrentMoment(message.createdAt)}
               photoURL="https://lh3.googleusercontent.com/a-/AOh14Gi4vkKYlfrbJ0QLJTg_DLjcYyyK7fYoWRpz2r4s=s96-c"
               displayName={message.authorName}
             />

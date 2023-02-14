@@ -29,16 +29,19 @@ const Auth = ({ setIsAuth, setUser }: AuthProps) => {
 
   const { handleChange, handleSubmit } = useFormik({
     initialValues: {
+      name: '',
+      surname: '',
       email: '',
       password: '',
     },
-    onSubmit: async ({ email, password }) => {
+    onSubmit: async ({ name, surname, email, password }) => {
       let response;
+      const data = { name, surname, email, password };
 
       if (isRegisterTypePage) {
-        response = await AuthService.registration(email, password);
+        response = await AuthService.registration(data);
       } else {
-        response = await AuthService.login(email, password);
+        response = await AuthService.login(data);
       }
 
       if (!response) return;
@@ -130,6 +133,28 @@ const Auth = ({ setIsAuth, setUser }: AuthProps) => {
               onSubmit={handleSubmit}
               sx={{ mt: 1 }}
             >
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="name"
+                onChange={handleChange}
+                label="Your Name"
+                name="name"
+                autoComplete="name"
+                autoFocus
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                onChange={handleChange}
+                name="surname"
+                label="Your Surname"
+                type="surname"
+                id="surname"
+                autoComplete="csurname"
+              />
               <TextField
                 margin="normal"
                 required

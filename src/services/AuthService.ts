@@ -9,6 +9,8 @@ interface AuthResponse {
 }
 
 interface AuthRequest {
+  name: string;
+  surname: string;
   email: string;
   password: string;
 }
@@ -21,10 +23,13 @@ class AuthService extends CrudService {
     this.uniqueName = 'auth';
   }
 
-  public async checkAuth(routeParams: { [key: string]: string }) {
-    const response = await this.getAll<AuthResponse>(routeParams, '/refresh');
+  public async checkAuth() {
+    const response = await this.httpRequest.get<AuthResponse>('', '/refresh');
 
-    console.log('response', response);
+    if (!response) {
+      return null;
+    }
+
     if ('error' in response) {
       const message = response.message;
 
@@ -37,14 +42,11 @@ class AuthService extends CrudService {
     return response.user;
   }
 
-  async login(email: string, password: string) {
+  async login(data: AuthRequest) {
     const routeParams = {};
 
     const response = await this.create<AuthRequest, AuthResponse>(
-      {
-        email,
-        password,
-      },
+      data,
       routeParams,
       '/login'
     );
@@ -61,14 +63,11 @@ class AuthService extends CrudService {
     return response;
   }
 
-  async registration(email: string, password: string) {
+  async registration(data: AuthRequest) {
     const routeParams = {};
 
     const response = await this.create<AuthRequest, AuthResponse>(
-      {
-        email,
-        password,
-      },
+      data,
       routeParams,
       '/registration'
     );
@@ -88,10 +87,7 @@ class AuthService extends CrudService {
   async logout() {
     const routeParams = {};
 
-    const response = await this.delete<void>(
-      routeParams,
-      '/logout'
-    );
+    const response = await this.delete<void>(routeParams, '/logout');
 
     if (typeof response === 'object' && 'error' in response) {
       const message = response.message;

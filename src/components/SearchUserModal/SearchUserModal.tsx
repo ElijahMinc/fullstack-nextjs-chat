@@ -7,6 +7,8 @@ import { useAuth } from '@/context/AuthContext';
 import { useInterlocutorData } from '@/context/InterlocutorContext';
 import UserService from '@/services/UserService';
 import ChatService from '@/services/ChatService';
+import { User } from '@/types/user';
+import { Nullable } from '@/types/Nullable';
 
 interface SearchUserModalProps {
   isOpen: boolean;
@@ -24,8 +26,9 @@ export const SearchUserModal: React.FC<SearchUserModalProps> = ({
   const { handleSelectedChat, handleInterlocutorData, interlocutorData } =
     useInterlocutorData();
   const { user: authUser } = useAuth();
-  const [users, setUsers] = useState<any[]>([]);
-  const [interlocutorId, setInterlocutorId] = useState(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [interlocutorId, setInterlocutorId] =
+    useState<Nullable<User['_id']>>(null);
 
   const fetchUsers = async () => {
     if (!authUser) return;
@@ -95,7 +98,7 @@ export const SearchUserModal: React.FC<SearchUserModalProps> = ({
             return (
               <ListItem key={user._id} disablePadding>
                 <ListItemButton onClick={() => setInterlocutorId(user._id)}>
-                  {user.email}
+                  {`${user.name} ${user.surname}`}
                 </ListItemButton>
               </ListItem>
             );

@@ -5,7 +5,7 @@ class TokenService {
   generateTokens(payload) {
     console.log('NEXT_JWT_ACCESS_SECRET', process.env.NEXT_JWT_ACCESS_SECRET);
     const accessToken = jwt.sign(payload, process.env.NEXT_JWT_ACCESS_SECRET, {
-      expiresIn: '1d',
+      expiresIn: '24h',
     });
     console.log('NEXT_JWT_ACCESS_SECRET', process.env.NEXT_JWT_REFRESH_SECRET);
 
@@ -13,7 +13,7 @@ class TokenService {
       payload,
       process.env.NEXT_JWT_REFRESH_SECRET,
       {
-        expiresIn: '2d',
+        expiresIn: '365d',
       }
     );
     // Если пользователь не заходил на наш аккаунт больше 30д, то ему нужно будет залогин

@@ -1,3 +1,4 @@
+import AuthService from '@/services/AuthService';
 import axios from 'axios';
 export interface IUser {
   email: string;
@@ -33,8 +34,6 @@ $AuthApi.interceptors.request.use((config) => {
 
 let _isRetry = true;
 
-let num = 0;
-
 $AuthApi.interceptors.response.use(
   (config) => config,
   async (err) => {
@@ -50,12 +49,15 @@ $AuthApi.interceptors.response.use(
       _isRetry = false;
 
       try {
-        const response = await $AuthApi.get<AuthResponse>(`auth/refresh`);
-        localStorage.setItem('token', response.data.accessToken);
+        const response = await AuthService.checkAuth();
+        if (!response) {
+          throw err;
+        }
         return $AuthApi.request(originalRequest);
       } catch (e) {
         console.log('Пользователь не авторизован');
         localStorage.removeItem('token');
+        throw e;
       }
     }
   }

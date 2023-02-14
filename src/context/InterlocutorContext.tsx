@@ -3,13 +3,7 @@ import { Chat } from '@/types/conversations';
 import { Nullable } from '@/types/Nullable';
 import { User } from '@/types/user';
 import { useRouter } from 'next/router';
-import {
-  createContext,
-  useState,
-  useEffect,
-  useMemo,
-  useContext,
-} from 'react';
+import { createContext, useState, useEffect, useMemo, useContext } from 'react';
 import { useAuth } from './AuthContext';
 
 export interface AuthProviderProps {
@@ -40,12 +34,12 @@ export const InterlocutorProvider = ({
     const selectedChatFromLocalStorage = localStorage.getItem('selectedChat')
       ? JSON.parse(localStorage.getItem('selectedChat') as string)
       : null;
-
     if (!!selectedChatFromLocalStorage) {
       setSelectedChat(selectedChatFromLocalStorage);
     }
   }, []);
 
+  console.log('selectedChat', selectedChat);
   useEffect(() => {
     if (!user) return;
     if (!selectedChat) return;
@@ -71,9 +65,10 @@ export const InterlocutorProvider = ({
     getUserData();
   }, [selectedChat]);
 
-  const handleInterlocutorData = (data: any) => setInterlocutorData(data);
+  const handleInterlocutorData = (data: Nullable<User>) =>
+    setInterlocutorData(data);
 
-  const handleSelectedChat = (chat: any) => {
+  const handleSelectedChat = (chat: Nullable<Chat>) => {
     if (!chat) {
       localStorage.removeItem('selectedChat');
     } else {

@@ -54,7 +54,7 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
         width: '100%',
       }}
     >
-      {userData?.email}
+      {`${userData?.name} ${userData?.surname}`}
       {isOnline && <span>Online</span>}
     </div>
   );

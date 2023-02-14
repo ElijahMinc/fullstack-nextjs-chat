@@ -92,16 +92,20 @@ const ChatBox: React.FC<ChatBoxProps> = memo(({ fetchChats }) => {
   };
 
   useEffect(() => {
+    console.log('selectedChat?._id', selectedChat);
+
     socket.on('recieve-message', async (receivedMessage: any) => {
+      console.log('receivedMessage', receivedMessage);
       if (!selectedChat) {
         fetchChats();
       }
-
+      console.log('receivedMessage.chatId', receivedMessage.chatId);
+      console.log('selectedChat?._id', selectedChat?._id);
       if (receivedMessage.chatId !== selectedChat?._id) return;
 
       setMessages([...messages, receivedMessage]);
     });
-  }, []);
+  }, [selectedChat, messages]);
 
   return (
     <ContainerChat>

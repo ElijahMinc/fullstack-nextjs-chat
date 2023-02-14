@@ -20,6 +20,8 @@ router.delete(('/chat/:chatId', ChatController.deleteChat));
 
 router.post(
   '/auth/registration',
+  body('name').isLength({ min: 3, max: 15 }),
+  body('surname').isLength({ min: 3, max: 15 }),
   body('email').isEmail(),
   body('password').isLength({ min: 3, max: 32 }),
   userController.registration
@@ -27,6 +29,8 @@ router.post(
 
 router.post(
   '/auth/login',
+  body('name').isLength({ min: 3, max: 15 }),
+  body('surname').isLength({ min: 3, max: 15 }),
   body('email').isEmail(),
   body('password').isLength({ min: 3, max: 32 }),
   userController.login

@@ -64,7 +64,9 @@ export const Sidebar = ({
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            {interlocutorData ? interlocutorData.email : ''}
+            {interlocutorData
+              ? `${interlocutorData?.name} ${interlocutorData?.surname}`
+              : ''}
           </Typography>
         </Toolbar>
       </AppBar>

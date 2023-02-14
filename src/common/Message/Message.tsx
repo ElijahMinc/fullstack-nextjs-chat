@@ -102,12 +102,12 @@ const ImageOrange = styled('img')(({ theme }) => ({
   height: theme.spacing(4),
 }));
 
-export interface Message {
+export interface MessageProps {
   message: string | undefined;
   timestamp: string | undefined;
 }
 
-export interface MessageLeft extends Message {
+export interface MessageLeft extends MessageProps {
   photoURL: string | undefined;
   displayName: string | undefined;
 }
@@ -121,7 +121,7 @@ export const MessageLeft = ({
   return (
     <>
       <MessageRow>
-        <ImageOrange src={photoURL ?? ''} alt={displayName}></ImageOrange>
+        <ImageOrange src={photoURL ?? ''}></ImageOrange>
         <div>
           <DisplayName>{displayName ?? ''}</DisplayName>
           <MessageBlue>

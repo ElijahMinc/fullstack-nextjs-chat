@@ -7,4 +7,6 @@ export interface Message extends Id {
   senderId: User['_id'];
   text: string;
   authorName: string;
+  createdAt: Date;
+  updatedAt: Date;
 }

@@ -6,7 +6,8 @@ const UserDto = require('../dtos/user-dto');
 const ApiError = require('../exceptions/api-error');
 
 class UserService {
-  async registration(email, password) {
+  async registration({ email, password, name, surname }) {
+    console.log('email', email);
     const candidate = await UserModel.findOne({ email });
 
     if (!!candidate) {
@@ -16,6 +17,8 @@ class UserService {
     const hashPassword = await bcrypt.hash(password, 3);
 
     const user = await UserModel.create({
+      name,
+      surname,
       email,
       password: hashPassword,
     });
@@ -24,7 +27,7 @@ class UserService {
 
     const tokens = tokenService.generateTokens({ ...userDto }); //just obj, not instance userDto
 
-    await tokenService.saveToken(userDto.id, tokens.refreshToken);
+    await tokenService.saveToken(userDto._id, tokens.refreshToken);
 
     return { ...tokens, user: userDto };
   }
@@ -39,7 +42,7 @@ class UserService {
     await user.save();
   }
 
-  async login(email, password) {
+  async login({ email, password, name, surname }) {
     const user = await UserModel.findOne({ email });
 
     if (!user) {
@@ -55,7 +58,7 @@ class UserService {
     const userDto = new UserDto(user);
     const tokens = tokenService.generateTokens({ ...userDto });
 
-    await tokenService.saveToken(userDto.id, tokens.refreshToken);
+    await tokenService.saveToken(userDto._id, tokens.refreshToken);
 
     return { ...tokens, user: userDto };
   }
@@ -86,7 +89,7 @@ class UserService {
     const userDto = new UserDto(user);
     const tokens = tokenService.generateTokens({ ...userDto });
 
-    await tokenService.saveToken(userDto.id, tokens.refreshToken);
+    await tokenService.saveToken(userDto._id, tokens.refreshToken);
 
     return { ...tokens, user: userDto };
   }

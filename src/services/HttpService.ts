@@ -35,18 +35,20 @@ export class HttpRequest {
   }
 
   processError(error: any) {
+    console.log('EE', error);
     return this.formatError(error);
   }
 
   formatError(error: any): ErrorResponse {
+    console.log('error', error);
     return JSON.parse(
       JSON.stringify({
         error: true,
-        message: error.response?.data?.message ?? error.message,
-        stack: error.stack,
-        details: error.response?.data?.exception,
-        config: error.config,
-        status: error.response?.status,
+        message: error?.response?.data?.message ?? error?.message ?? '',
+        stack: error?.stack,
+        details: error?.response?.data?.exception,
+        config: error?.config ?? {},
+        status: error?.response?.status ?? null,
       })
     );
   }
@@ -74,6 +76,8 @@ export class HttpRequest {
   private parseDataFromAxios<TData, ReturnV>(
     response: AxiosResponse<TData, ReturnV>
   ) {
+    if (!response) return response;
+
     return response.data;
   }
 
