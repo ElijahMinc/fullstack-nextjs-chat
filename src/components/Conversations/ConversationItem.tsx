@@ -1,4 +1,6 @@
-import { getUser } from '@/api/UserRequests';
+import UserService from '@/services/UserService';
+import { Nullable } from '@/types/Nullable';
+import { User } from '@/types/user';
 import Skeleton from '@mui/material/Skeleton';
 import React, { useEffect, useState } from 'react';
 
@@ -12,13 +14,14 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
   isOnline,
 }) => {
   const [isLoading, setLoading] = useState(true);
-  const [userData, setUserData] = useState<any>({});
+  const [userData, setUserData] = useState<Nullable<User>>(null);
 
   useEffect(() => {
     const getUserData = async () => {
       try {
-        const { data } = await getUser(interlocutorId);
-        setUserData(data);
+        const user = await UserService.getUserById(interlocutorId);
+        console.log('user', user);
+        setUserData(user);
       } catch (error) {
         console.log(error);
       } finally {

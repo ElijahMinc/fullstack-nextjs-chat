@@ -6,6 +6,14 @@ import axios, {
   CancelTokenStatic,
 } from 'axios';
 
+export interface ErrorResponse {
+  message: string;
+  stack: string;
+  details: string;
+  config: string;
+  status: string;
+  error: true;
+}
 export class HttpRequest {
   public path: string;
 
@@ -27,12 +35,13 @@ export class HttpRequest {
   }
 
   processError(error: any) {
-    throw this.formatError(error);
+    return this.formatError(error);
   }
 
-  formatError(error: any) {
+  formatError(error: any): ErrorResponse {
     return JSON.parse(
       JSON.stringify({
+        error: true,
         message: error.response?.data?.message ?? error.message,
         stack: error.stack,
         details: error.response?.data?.exception,
@@ -42,46 +51,57 @@ export class HttpRequest {
     );
   }
 
-  async delete(
+  async delete<ReturnV>(
     routeParams = '',
     route = ''
-  ): Promise<AxiosResponse<any, any> | void> {
+  ): Promise<ReturnV | ErrorResponse> {
     return await this.$api
-      .delete(this.url(route, routeParams))
-      .catch(this.processError.bind(this));
-  }
-
-  async get<T>(
-    routeParams = '',
-    route = ''
-  ): Promise<AxiosResponse<T, any> | void> {
-    return await this.$api
-      .get(this.url(route, routeParams))
+      .delete<void, AxiosResponse<ReturnV>>(this.url(route, routeParams))
       .then(this.parseDataFromAxios.bind(this))
       .catch(this.processError.bind(this));
   }
 
-  private parseDataFromAxios<T>(response: AxiosResponse<T, any>) {
-    return response.data;
-  }
-
-  async post<T>(
-    data: T,
+  async get<ReturnV>(
     routeParams = '',
     route = ''
-  ): Promise<AxiosResponse<any, any> | void> {
+  ): Promise<ReturnV | ErrorResponse> {
     return await this.$api
-      .post(this.url(route, routeParams), data)
+      .get<void, AxiosResponse<ReturnV>>(this.url(route, routeParams))
+      .then(this.parseDataFromAxios.bind(this))
       .catch(this.processError.bind(this));
   }
 
-  async put<T>(
-    data: T,
+  private parseDataFromAxios<TData, ReturnV>(
+    response: AxiosResponse<TData, ReturnV>
+  ) {
+    return response.data;
+  }
+
+  async post<TData, ReturnV>(
+    data: TData,
     routeParams = '',
     route = ''
-  ): Promise<AxiosResponse<any, any> | void> {
+  ): Promise<ReturnV | ErrorResponse> {
     return await this.$api
-      .put(this.url(route, routeParams), data)
+      .post<void, AxiosResponse<ReturnV, TData>, TData>(
+        this.url(route, routeParams),
+        data
+      )
+      .then(this.parseDataFromAxios.bind(this))
+      .catch(this.processError.bind(this));
+  }
+
+  async put<TData, ReturnV>(
+    data: TData,
+    routeParams = '',
+    route = ''
+  ): Promise<ReturnV | ErrorResponse> {
+    return await this.$api
+      .put<void, AxiosResponse<ReturnV, TData>, TData>(
+        this.url(route, routeParams),
+        data
+      )
+      .then(this.parseDataFromAxios.bind(this))
       .catch(this.processError.bind(this));
   }
 

@@ -15,6 +15,8 @@ router.get('/message/:chatId', MessageController.getMessages);
 router.post('/chat', ChatController.createChat);
 router.get('/chat/:userId', ChatController.userChats);
 router.get('/chat/find/:firstId/:secondId', ChatController.findChat);
+router.get('/chat/find/:id', ChatController.getChatById);
+router.delete(('/chat/:chatId', ChatController.deleteChat));
 
 router.post(
   '/auth/registration',
@@ -29,9 +31,10 @@ router.post(
   body('password').isLength({ min: 3, max: 32 }),
   userController.login
 );
-router.get('/auth/refresh', userController.refresh); // для перезаписи access tokena (удаления токена из БД)
 
-router.post('/logout', userController.logout); // для рефреш токена
+router.get('/auth/refresh', userController.refresh); // для перезаписи access tokena (удаления токена из БД)
+router.delete('/auth/logout', userController.logout); // для рефреш токена
+
 router.get('/activate/:link', userController.activate); // для активации аккаунта по ссылке
 router.get('/users', authMiddleware, userController.getUsers); // тестовый енд для получения списка юзера
 router.get('/users/:id', authMiddleware, userController.getUserById); // тестовый енд для получения списка юзера

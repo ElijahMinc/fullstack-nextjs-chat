@@ -3,87 +3,56 @@ import {
   Button,
   Divider,
   Drawer,
-  Grid,
   IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  styled,
   Toolbar,
   Typography,
 } from '@mui/material';
 import { GetServerSideProps } from 'next';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import { DrawerHeader } from '@/common/DrawerHeader/DrawerHeader';
-import { useRouter } from 'next/router';
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
-import { getAllUsers } from '@/api/UserRequests';
-import { createChat, userChats } from '@/api/ChatRequests';
-import { logout } from '@/api/AuthRequests';
 import { AppBar } from '@/common/AppBar/AppBar';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Conversations } from '../Conversations/Conversations';
-import { socket } from '@/config/socket';
 import { useAuth } from '@/context/AuthContext';
 import { useInterlocutorData } from '@/context/InterlocutorContext';
+import { SearchUserModal } from '../SearchUserModal/SearchUserModal';
 
 interface SidebarProps {
-  chats?: any[];
-  currentUserId: string;
+  chats: any[];
+  fetchChats: () => void;
   open: boolean;
   handleDrawerClose: () => void;
   handleDrawerOpen: () => void;
+  addedUserIds: string[];
 }
 export const drawerWidth = 340;
 
 export const Sidebar = ({
-  currentUserId,
+  chats,
   open,
+  addedUserIds,
+  fetchChats,
   handleDrawerClose,
   handleDrawerOpen,
 }: SidebarProps) => {
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleCloseModal = () => setOpenModal(false);
+
   const { logoutAuth } = useAuth();
   const { interlocutorData } = useInterlocutorData();
-  const [chats, setChats] = useState<any[]>([]);
-
-  const [fetchAllUsers, setAllUsers] = useState([]);
-  const router = useRouter();
-
-  const fetchUsers = async () => {
-    const users = await getAllUsers();
-    const usersWithoutMe = users.data.filter(
-      (user: any) => user._id !== currentUserId
-    );
-    setAllUsers(usersWithoutMe);
-  };
-
-  const createPersonalChat = async (receiverId: string) => {
-    const data: any = {
-      senderId: currentUserId,
-      receiverId,
-    };
-    const chat = await createChat(data);
-  };
-
-  useEffect(() => {
-    const getChats = async () => {
-      try {
-        const { data } = await userChats(currentUserId);
-        setChats(data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getChats();
-  }, []);
 
   return (
     <>
+      <SearchUserModal
+        isOpen={openModal}
+        addedUserIds={addedUserIds}
+        refetchChats={fetchChats}
+        handleCancel={handleCloseModal}
+      />
+
       <AppBar position="fixed" open={open}>
         <Toolbar>
           <IconButton
@@ -123,7 +92,11 @@ export const Sidebar = ({
           <IconButton onClick={logoutAuth}>
             <PowerSettingsNewIcon color="error" />
           </IconButton>
-          <Button fullWidth variant="contained" onClick={fetchUsers}>
+          <Button
+            fullWidth
+            variant="contained"
+            onClick={() => setOpenModal(true)}
+          >
             User Search
           </Button>
           <IconButton onClick={handleDrawerClose}>

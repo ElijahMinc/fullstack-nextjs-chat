@@ -1,17 +1,34 @@
 const MessageModel = require('../models/message-model');
+const ChatModel = require('../models/chat-model');
 
 class MessageController {
   async addMessage(req, res) {
-    const { chatId, senderId, text } = req.body;
-    console.log({ chatId, senderId, text });
-    const message = new MessageModel({
+    const { chatId: chatIdFromBody, senderId, receiverId, text } = req.body;
+    console.log('chatIdFromBody', chatIdFromBody);
+    let chatId = await ChatModel.findById(chatIdFromBody);
+
+    let isNewChatCreated = false;
+
+    if (!chatId) {
+      const newChat = new ChatModel({
+        members: [req.body.senderId, req.body.receiverId],
+      });
+
+      await newChat.save();
+      chatId = newChat._id;
+      console.log('newChat', newChat);
+      isNewChatCreated = true;
+    }
+    console.log('chatId', chatId);
+    const createdMessage = new MessageModel({
       chatId,
       senderId,
+      receiverId,
       text,
     });
     try {
-      const result = await message.save();
-      res.status(200).json(result);
+      const message = await createdMessage.save();
+      res.status(200).json({ message, isNewChatCreated });
     } catch (error) {
       res.status(500).json(error);
     }

@@ -14,14 +14,11 @@ class UserService {
     }
 
     const hashPassword = await bcrypt.hash(password, 3);
-    const activationLink = uuid.v4();
+
     const user = await UserModel.create({
       email,
       password: hashPassword,
-      activationLink,
     });
-
-    const ACTIVATE_URL = `${process.env.API_URL}/api/activate/${activationLink}`;
 
     const userDto = new UserDto(user); // id, email, isActivated
 
@@ -80,7 +77,11 @@ class UserService {
       throw ApiError.UnauthorizedError();
     }
 
-    const user = await UserModel.findById(userData.id);
+    const user = await UserModel.findById(userData._id);
+
+    if (!user) {
+      throw ApiError.UnauthorizedError();
+    }
 
     const userDto = new UserDto(user);
     const tokens = tokenService.generateTokens({ ...userDto });

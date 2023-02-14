@@ -1,11 +1,9 @@
 import { Layout } from '@/components/Layout';
 import type { AppProps } from 'next/app';
-
-import Auth from './auth';
 import { ThemeCustomProvider } from '@/context/ColorModeContext';
 import { ToggleColorMode } from '@/components/ToggleColorMode/ToggleColorMode';
 import { AuthProvider } from '@/context/AuthContext';
-import ChatLayout from '@/components/ChatLayout/ChatLayout';
+import Auth from './auth';
 
 import '@/styles/globals.css';
 
@@ -19,9 +17,7 @@ const App = ({ Component, pageProps }: AppProps) => {
             {!isAuth ? (
               <Auth setIsAuth={changeAuth} setUser={setUser} />
             ) : (
-              // <ChatLayout>
               <Component {...pageProps} />
-              // </ChatLayout>
             )}
           </Layout>
         )}

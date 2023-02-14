@@ -1,6 +1,18 @@
-import { $AuthApi } from '@/config/axios.http';
 import CrudService from './CrudService';
-import cookieNext from 'cookies-next';
+import { User } from '@/types/user';
+import { socket } from '@/config/socket';
+
+interface AuthResponse {
+  user: User;
+  accessToken: string;
+  refreshToken: string;
+}
+
+interface AuthRequest {
+  email: string;
+  password: string;
+}
+
 class AuthService extends CrudService {
   public uniqueName: string;
 
@@ -9,49 +21,90 @@ class AuthService extends CrudService {
     this.uniqueName = 'auth';
   }
 
-  public async checkAuth(params: any): Promise<any> {
-    try {
-      const response = await this.getAll(params, '/refresh');
+  public async checkAuth(routeParams: { [key: string]: string }) {
+    const response = await this.getAll<AuthResponse>(routeParams, '/refresh');
 
-      localStorage.setItem('token', response.accessToken);
-      localStorage.setItem('user', JSON.stringify(response.user));
+    console.log('response', response);
+    if ('error' in response) {
+      const message = response.message;
 
-      return response.user;
-    } catch (error) {
       return null;
     }
+
+    localStorage.setItem('token', response.accessToken);
+    localStorage.setItem('user', JSON.stringify(response.user));
+
+    return response.user;
   }
 
   async login(email: string, password: string) {
-    try {
-      const response: any = await $AuthApi.post('/auth/login', {
+    const routeParams = {};
+
+    const response = await this.create<AuthRequest, AuthResponse>(
+      {
         email,
         password,
-      });
+      },
+      routeParams,
+      '/login'
+    );
+    console.log('res', response);
+    if ('error' in response) {
+      const message = response.message;
 
-      localStorage.setItem('token', response.data.accessToken);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-
-      return response;
-    } catch (e: any) {
       return null;
     }
+
+    localStorage.setItem('token', response.accessToken);
+    localStorage.setItem('user', JSON.stringify(response.user));
+
+    return response;
   }
 
   async registration(email: string, password: string) {
-    try {
-      const response: any = await $AuthApi.post('/auth/registration', {
+    const routeParams = {};
+
+    const response = await this.create<AuthRequest, AuthResponse>(
+      {
         email,
         password,
-      });
+      },
+      routeParams,
+      '/registration'
+    );
 
-      localStorage.setItem('token', response.data.accessToken);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+    if ('error' in response) {
+      const message = response.message;
 
-      return response;
-    } catch (e: any) {
       return null;
     }
+
+    localStorage.setItem('token', response.accessToken);
+    localStorage.setItem('user', JSON.stringify(response.user));
+
+    return response;
+  }
+
+  async logout() {
+    const routeParams = {};
+
+    const response = await this.delete<void>(
+      routeParams,
+      '/logout'
+    );
+
+    if (typeof response === 'object' && 'error' in response) {
+      const message = response.message;
+
+      return null;
+    }
+
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('selectedChat');
+    socket.disconnect();
+
+    return response;
   }
 }
 

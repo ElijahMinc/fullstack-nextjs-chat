@@ -1,6 +1,7 @@
-import { logout } from '@/api/AuthRequests';
 import { Loader } from '@/common/Loader/Loader';
 import AuthService from '@/services/AuthService';
+import { Nullable } from '@/types/Nullable';
+import { User } from '@/types/user';
 import { useRouter } from 'next/router';
 import {
   createContext,
@@ -12,10 +13,10 @@ import {
 } from 'react';
 
 export interface AuthProviderProps {
-  user: any;
+  user: Nullable<User>;
   isAuth: boolean;
   changeAuth: () => void;
-  handleSetUser: (user: any) => void;
+  handleSetUser: (user: User) => void;
   logoutAuth: () => void;
 }
 
@@ -35,14 +36,14 @@ export const AuthProvider = ({ children }: AuthProviderComponentProps) => {
   const router = useRouter();
   const [isAuth, setAuth] = useState(false);
   const [isLoading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<Nullable<User>>(null);
 
   useEffect(() => {
     const authCheck = async () => {
       setLoading(true);
 
       const user = await AuthService.checkAuth({});
-      console.log('user', user);
+
       if (!user) {
         setAuth(false);
         router.push({
@@ -54,7 +55,7 @@ export const AuthProvider = ({ children }: AuthProviderComponentProps) => {
         setUser(user);
         setAuth(true);
         router.push({
-          pathname: '/',
+          pathname: router.pathname === '/auth' ? '/' : router.pathname,
         });
         setLoading(false);
       }
@@ -65,10 +66,10 @@ export const AuthProvider = ({ children }: AuthProviderComponentProps) => {
 
   const changeAuth = useCallback(() => setAuth(true), []);
 
-  const handleSetUser = useCallback((user: any) => setUser(user), []);
+  const handleSetUser = useCallback((user: User) => setUser(user), []);
 
   const logoutAuth = useCallback(async () => {
-    await logout();
+    await AuthService.logout();
     setAuth(false);
     setUser(null);
     router.push({

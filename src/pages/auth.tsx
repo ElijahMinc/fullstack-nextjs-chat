@@ -11,20 +11,19 @@ import Typography from '@mui/material/Typography';
 import Nature from '@/public/nature.jpg';
 import { useFormik } from 'formik';
 import AuthService from '@/services/AuthService';
-import { useAuth } from '@/context/AuthContext';
+import { User } from '@/types/user';
 
 enum AuthType {
   LOGIN = 'login',
   REGISTER = 'register',
 }
 
-const Auth = ({
-  setIsAuth,
-  setUser,
-}: {
+interface AuthProps {
   setIsAuth: () => void;
-  setUser: (user: any) => void;
-}) => {
+  setUser: (user: User) => void;
+}
+
+const Auth = ({ setIsAuth, setUser }: AuthProps) => {
   const router = useRouter();
   const isRegisterTypePage = router.query?.type === AuthType.REGISTER;
 
@@ -41,10 +40,10 @@ const Auth = ({
       } else {
         response = await AuthService.login(email, password);
       }
-      debugger;
+
       if (!response) return;
 
-      const user = response.data.user;
+      const user = response.user;
 
       setUser(user);
       setIsAuth();

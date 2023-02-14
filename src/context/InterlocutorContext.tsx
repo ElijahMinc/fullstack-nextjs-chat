@@ -1,4 +1,7 @@
-import { getUser } from '@/api/UserRequests';
+import UserService from '@/services/UserService';
+import { Chat } from '@/types/conversations';
+import { Nullable } from '@/types/Nullable';
+import { User } from '@/types/user';
 import { useRouter } from 'next/router';
 import {
   createContext,
@@ -6,15 +9,14 @@ import {
   useEffect,
   useMemo,
   useContext,
-  useCallback,
 } from 'react';
 import { useAuth } from './AuthContext';
 
 export interface AuthProviderProps {
-  interlocutorData: any;
-  selectedChat: any;
-  handleInterlocutorData: (data: any) => void;
-  handleSelectedChat: (data: any) => void;
+  interlocutorData: Nullable<User>;
+  selectedChat: Nullable<Chat>;
+  handleInterlocutorData: (data: Nullable<User>) => void;
+  handleSelectedChat: (data: Nullable<Chat>) => void;
 }
 
 const InterlocutorProviderContext = createContext<AuthProviderProps>(
@@ -30,8 +32,9 @@ export const InterlocutorProvider = ({
 }: InterlocutorProviderContextComponentProps) => {
   const route = useRouter();
   const { user } = useAuth();
-  const [interlocutorData, setInterlocutorData] = useState(null);
-  const [selectedChat, setSelectedChat] = useState<any>(null);
+  const [interlocutorData, setInterlocutorData] =
+    useState<Nullable<User>>(null);
+  const [selectedChat, setSelectedChat] = useState<Nullable<Chat>>(null);
 
   useEffect(() => {
     const selectedChatFromLocalStorage = localStorage.getItem('selectedChat')
@@ -44,16 +47,21 @@ export const InterlocutorProvider = ({
   }, []);
 
   useEffect(() => {
+    if (!user) return;
     if (!selectedChat) return;
 
-    const userId = selectedChat.members.find((id: string) => id !== user.id);
+    const userId = selectedChat.members.find((id: string) => id !== user._id);
+
+    if (!userId) return;
 
     const getUserData = async () => {
       try {
-        const { data } = await getUser(userId);
-        setInterlocutorData(data);
+        const interlocutorData = await UserService.getUserById(userId);
+        setInterlocutorData(interlocutorData);
         route.push({
-          query: selectedChat._id,
+          query: {
+            chatId: selectedChat._id,
+          },
         });
       } catch (error) {
         console.log(error);
@@ -63,14 +71,17 @@ export const InterlocutorProvider = ({
     getUserData();
   }, [selectedChat]);
 
-  const handleInterlocutorData = useCallback(
-    (data: any) => setInterlocutorData(data),
-    []
-  );
-  const handleSelectedChat = useCallback((chat: any) => {
-    localStorage.setItem('selectedChat', JSON.stringify(chat));
+  const handleInterlocutorData = (data: any) => setInterlocutorData(data);
+
+  const handleSelectedChat = (chat: any) => {
+    if (!chat) {
+      localStorage.removeItem('selectedChat');
+    } else {
+      localStorage.setItem('selectedChat', JSON.stringify(chat));
+    }
+
     setSelectedChat(chat);
-  }, []);
+  };
 
   const value = useMemo(
     () => ({

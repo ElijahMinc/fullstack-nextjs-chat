@@ -13,6 +13,15 @@ class ChatController {
     }
   }
 
+  async deleteChat(req, res) {
+    const deletedChat = await ChatModel.findByIdAndDelete(req.params.id);
+    try {
+      res.status(200).json(deletedChat);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
   async userChats(req, res) {
     try {
       const chat = await ChatModel.find({
@@ -29,6 +38,15 @@ class ChatController {
       const chat = await ChatModel.findOne({
         members: { $all: [req.params.firstId, req.params.secondId] },
       });
+      res.status(200).json(chat);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
+  async getChatById(req, res) {
+    try {
+      const chat = await ChatModel.findById(req.params.id);
       res.status(200).json(chat);
     } catch (error) {
       res.status(500).json(error);

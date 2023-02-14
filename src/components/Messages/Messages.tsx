@@ -1,6 +1,8 @@
 import React, { useRef, useEffect } from 'react';
 import { styled } from '@mui/material';
 import { MessageLeft, MessageRight } from '@/common/Message/Message';
+import { Nullable } from '@/types/Nullable';
+import { Message } from '@/types/message';
 
 const MessageBody = styled('div')(({ theme }) => ({
   width: 'calc( 100% - 20px )',
@@ -23,7 +25,7 @@ const MessageBody = styled('div')(({ theme }) => ({
   },
 }));
 interface MessagesProps {
-  messages: any[];
+  messages: Message[];
   currentUserId: string;
 }
 
@@ -31,11 +33,14 @@ export const Messages: React.FC<MessagesProps> = ({
   messages,
   currentUserId,
 }) => {
-  const scroll = useRef<any>();
+  const scroll = useRef<Nullable<HTMLDivElement>>(null);
 
   useEffect(() => {
-    scroll.current?.scrollIntoView({ behavior: 'smooth' });
+    if (!scroll.current) return;
+
+    scroll.current.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
   return (
     <MessageBody>
       {messages.map((message) => (
@@ -53,7 +58,7 @@ export const Messages: React.FC<MessagesProps> = ({
               message={message.text}
               timestamp="MM/DD 00:00"
               photoURL="https://lh3.googleusercontent.com/a-/AOh14Gi4vkKYlfrbJ0QLJTg_DLjcYyyK7fYoWRpz2r4s=s96-c"
-              displayName={message.email}
+              displayName={message.authorName}
             />
           )}
           <div ref={scroll} id="scrollIntoView"></div>

@@ -1,6 +1,8 @@
 import { socket } from '@/config/socket';
 import { useAuth } from '@/context/AuthContext';
 import { useInterlocutorData } from '@/context/InterlocutorContext';
+import { Chat } from '@/types/conversations';
+import { User } from '@/types/user';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -15,16 +17,17 @@ interface ConversationsProps {
 export const Conversations: React.FC<ConversationsProps> = ({ chats }) => {
   const { user } = useAuth();
   const { handleSelectedChat } = useInterlocutorData();
-  const [onlineUsers, setOnlineUsers] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    socket.on('get-users', (users: any) => {
+    socket.on('get-users', (users: User[]) => {
       setOnlineUsers(users);
     });
   }, []);
 
-  const checkOnlineStatus = (chat: any) => {
-    const chatMember = chat.members.find((member: any) => member !== user.id);
+  const checkOnlineStatus = (chat: Chat): boolean => {
+    if (!user) return false;
+    const chatMember = chat.members.find((member: any) => member !== user._id);
     const online: any = onlineUsers.find(
       (user: any) => user.userId === chatMember
     );
@@ -35,7 +38,7 @@ export const Conversations: React.FC<ConversationsProps> = ({ chats }) => {
     <List>
       {chats.map((chat) => {
         const interlocutorId = chat.members.find(
-          (id: string) => id !== user.id
+          (id: string) => id !== (user as User)._id
         );
 
         return (

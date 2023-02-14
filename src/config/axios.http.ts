@@ -16,6 +16,11 @@ const $AuthApi = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api`,
 });
 
+const $BaseApi = axios.create({
+  withCredentials: true, // чтобы к каждому полю автомат. были куки
+  baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api`,
+});
+
 // interceprot - перехватчик
 
 $AuthApi.interceptors.request.use((config) => {
@@ -26,24 +31,27 @@ $AuthApi.interceptors.request.use((config) => {
   return config;
 });
 
+let _isRetry = true;
+
+let num = 0;
+
 $AuthApi.interceptors.response.use(
   (config) => config,
   async (err) => {
     const originalRequest = err.config;
+    originalRequest.headers._isRetry = true;
 
     if (err.response.status !== 401) {
       throw err; // ошибка у которой не 401 статус-код
     }
-
-    if (originalRequest && !originalRequest._isRetry) {
-      originalRequest._isRetry = true;
+    console.log(originalRequest);
+    if (_isRetry) {
+      // originalRequest.headers._isRetry = null;
+      _isRetry = false;
 
       try {
-        const response = await axios.get<AuthResponse>(`/auth/refresh`, {
-          withCredentials: true,
-        });
+        const response = await $AuthApi.get<AuthResponse>(`auth/refresh`);
         localStorage.setItem('token', response.data.accessToken);
-
         return $AuthApi.request(originalRequest);
       } catch (e) {
         console.log('Пользователь не авторизован');

@@ -10,6 +10,10 @@ const UserSchema = new Schema({
     type: String,
     require: true,
   },
+  photoUrl: {
+    type: String,
+    default: '',
+  },
 });
 
 module.exports = model('User', UserSchema);

@@ -2,35 +2,57 @@ import { getQueryParams } from '@/utils/getQueryParams';
 import { HttpRequest } from './HttpService';
 
 class CrudService {
-  httpRequest: HttpRequest;
+  protected httpRequest: HttpRequest;
 
   constructor(path: string) {
     this.httpRequest = new HttpRequest(path);
   }
 
-  protected async getAll<T>(params: any, route?: string): Promise<any> {
+  protected async getAll<ReturnV>(params: any, route?: string) {
     const routeParams = getQueryParams({
       ...params,
     });
-    return await this.httpRequest.get<T>(routeParams, route);
+    return await this.httpRequest.get<ReturnV>(routeParams, route);
   }
 
-  protected async getById(id?: string) {
-    return await this.httpRequest.get('', `/${id}`);
+  protected async getById<TData extends string, ReturnV>(
+    id: TData,
+    params?: { [key: string]: string },
+    route?: string
+  ) {
+    const routeParams = getQueryParams({
+      ...params,
+    });
+    return await this.httpRequest.get<ReturnV>(
+      routeParams,
+      `${route ?? ''}/${id}`
+    );
   }
 
-  protected async create<T>(data: T) {
-    return await this.httpRequest.post(data);
+  protected async create<TData, VoidR>(
+    data: TData,
+    params?: { [key: string]: string },
+    route?: string
+  ) {
+    const routeParams = getQueryParams(params ?? {});
+    return await this.httpRequest.post<TData, VoidR>(data, routeParams, route);
   }
 
-  protected async update<T>(data: T, params?: any, route?: string) {
+  protected async update<T>(
+    data: T,
+    params?: { [key: string]: string },
+    route?: string
+  ) {
     const routeParams = getQueryParams(params ?? {});
     return await this.httpRequest.put(data, routeParams, route);
   }
 
-  protected async delete(params?: any, route?: string) {
+  protected async delete<VoidR>(
+    params?: { [key: string]: string },
+    route?: string
+  ) {
     const routeParams = getQueryParams(params ?? {});
-    return await this.httpRequest.delete(routeParams, route);
+    return await this.httpRequest.delete<VoidR>(routeParams, route);
   }
 
   protected abortRequest() {
