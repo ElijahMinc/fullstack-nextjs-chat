@@ -66,8 +66,20 @@ class AuthService extends CrudService {
   async registration(data: AuthRequest) {
     const routeParams = {};
 
-    const response = await this.create<AuthRequest, AuthResponse>(
-      data,
+    const formData = new FormData();
+
+    Object.entries(data).forEach(([name, value]) => {
+      if (Array.isArray(value as string[])) {
+        for (const nameOfTag of value) {
+          formData.append(name, nameOfTag);
+        }
+        return;
+      }
+      formData.append(name, value);
+    });
+
+    const response = await this.create<FormData, AuthResponse>(
+      formData,
       routeParams,
       '/registration'
     );

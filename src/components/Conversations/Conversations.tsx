@@ -16,7 +16,7 @@ interface ConversationsProps {
 
 export const Conversations: React.FC<ConversationsProps> = ({ chats }) => {
   const { user } = useAuth();
-  const { handleSelectedChat } = useInterlocutorData();
+  const { handleSelectedChat, interlocutorData } = useInterlocutorData();
   const [onlineUsers, setOnlineUsers] = useState<User[]>([]);
 
   useEffect(() => {
@@ -40,10 +40,19 @@ export const Conversations: React.FC<ConversationsProps> = ({ chats }) => {
         const interlocutorId = chat.members.find(
           (id: string) => id !== (user as User)._id
         );
-
+        const isSelecteChat = interlocutorData
+          ? interlocutorId === interlocutorData._id
+          : false;
         return (
           <ListItem key={chat._id} disablePadding>
-            <ListItemButton onClick={() => handleSelectedChat(chat)}>
+            <ListItemButton
+              onClick={() => handleSelectedChat(chat)}
+              sx={{
+                backgroundColor: isSelecteChat
+                  ? 'rgba(255, 255, 255, 0.08);'
+                  : undefined,
+              }}
+            >
               <ConversationItem
                 interlocutorId={interlocutorId}
                 isOnline={checkOnlineStatus(chat)}

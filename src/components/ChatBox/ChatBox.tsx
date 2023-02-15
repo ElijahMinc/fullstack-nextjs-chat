@@ -54,15 +54,15 @@ const ChatBox: React.FC<ChatBoxProps> = memo(({ fetchChats }) => {
     fetchMessages();
   }, [selectedChat]);
 
+  console.log('user', user);
   const handleSend = async (text: string) => {
     if (!user) return;
     if (!interlocutorData) return;
-
     const message: any = {
       senderId: user._id,
       receiverId: interlocutorData._id,
       chatId: selectedChat?._id ?? null,
-      authorName: user.email,
+      authorName: `${user.name} ${user.surname}`,
       text,
     };
     const receiverId =
@@ -99,8 +99,7 @@ const ChatBox: React.FC<ChatBoxProps> = memo(({ fetchChats }) => {
       if (!selectedChat) {
         fetchChats();
       }
-      console.log('receivedMessage.chatId', receivedMessage.chatId);
-      console.log('selectedChat?._id', selectedChat?._id);
+
       if (receivedMessage.chatId !== selectedChat?._id) return;
 
       setMessages([...messages, receivedMessage]);

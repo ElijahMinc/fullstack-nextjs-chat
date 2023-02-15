@@ -5,4 +5,5 @@ export interface User extends Id {
   surname: string;
   email: string;
   password: string;
+  avatarUrl: string;
 }

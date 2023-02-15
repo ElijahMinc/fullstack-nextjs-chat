@@ -98,6 +98,8 @@ const MessageOrange = styled('div')(({ theme }) => ({
 const ImageOrange = styled('img')(({ theme }) => ({
   // color: theme.palette.getContrastText('#fff'),
   // backgroundColor: '#000',
+  objectFit: 'cover',
+  borderRadius: '50%',
   width: theme.spacing(4),
   height: theme.spacing(4),
 }));

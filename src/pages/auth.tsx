@@ -11,12 +11,57 @@ import Typography from '@mui/material/Typography';
 import Nature from '@/public/nature.jpg';
 import { useFormik } from 'formik';
 import AuthService from '@/services/AuthService';
+import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
 import { User } from '@/types/user';
+import { styled } from '@mui/material';
+import { useRef, useState, ChangeEvent } from 'react';
+import { Nullable } from '@/types/Nullable';
+import { socket } from '@/config/socket';
 
 enum AuthType {
   LOGIN = 'login',
   REGISTER = 'register',
 }
+
+interface AvatarImageProps {
+  isShowAddAvatar?: boolean;
+}
+
+export const AvatarImage = styled(Avatar, {
+  shouldForwardProp: (prop) => prop !== 'isShowAddAvatar',
+})<AvatarImageProps>(({ theme, isShowAddAvatar }) => ({
+  position: 'relative',
+  // backgroundColor: theme.palette.background.paper,
+  cursor: 'pointer',
+  borderRadius: '50%',
+  zIndex: 2,
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? theme.palette.primary.light
+      : theme.palette.primary.dark,
+  // ...(isShowAddAvatar && {
+  //   '&:after': {
+  //     content: '"+"',
+  //     position: 'absolute',
+  //     bottom: -2,
+  //     right: 0,
+  //     // transform: 'translateX(50%)',
+  //     zIndex: 1,
+  //     width: '10px',
+  //     height: '10px',
+  //     fontSize: '16px',
+  //     backgroundColor:
+  //       theme.palette.mode === 'dark'
+  //         ? theme.palette.primary.light
+  //         : theme.palette.primary.dark,
+  //     borderRadius: '50%',
+  //     display: isShowAddAvatar ? 'flex' : 'none',
+  //     justifyContent: 'center',
+  //     alignItems: 'center',
+  //     padding: '7px',
+  //   },
+  // }),
+}));
 
 interface AuthProps {
   setIsAuth: () => void;
@@ -24,19 +69,22 @@ interface AuthProps {
 }
 
 const Auth = ({ setIsAuth, setUser }: AuthProps) => {
+  const [previewImg, setPreview] = useState<string>('');
+  const imageRef = useRef<Nullable<HTMLInputElement>>(null);
   const router = useRouter();
   const isRegisterTypePage = router.query?.type === AuthType.REGISTER;
 
-  const { handleChange, handleSubmit } = useFormik({
+  const { handleChange, handleSubmit, setFieldValue, values } = useFormik({
     initialValues: {
       name: '',
       surname: '',
       email: '',
       password: '',
+      image: '',
     },
-    onSubmit: async ({ name, surname, email, password }) => {
+    onSubmit: async ({ name, surname, email, password, image }) => {
       let response;
-      const data = { name, surname, email, password };
+      const data = { name, surname, email, password, image };
 
       if (isRegisterTypePage) {
         response = await AuthService.registration(data);
@@ -50,7 +98,7 @@ const Auth = ({ setIsAuth, setUser }: AuthProps) => {
 
       setUser(user);
       setIsAuth();
-
+      socket.connect()
       router.push({
         pathname: '/',
       });
@@ -63,6 +111,27 @@ const Auth = ({ setIsAuth, setUser }: AuthProps) => {
       query: { type: isRegisterTypePage ? 'login' : 'register' },
     });
   };
+  console.log('values', values);
+  const handleChangeFile = (e: ChangeEvent<HTMLInputElement>) => {
+    // debugger;
+    if (imageRef.current && !!imageRef.current.value) {
+      setPreview('');
+      setFieldValue('image', '');
+    }
+
+    const target = e.target;
+    if (!target?.files?.length) return;
+
+    const files = Array.from(target.files);
+
+    files.forEach((file) => {
+      const link = URL.createObjectURL(file);
+      setPreview(link);
+    });
+
+    setFieldValue('image', files[0]);
+  };
+
   return (
     <Box
       maxWidth="900px"
@@ -121,9 +190,37 @@ const Auth = ({ setIsAuth, setUser }: AuthProps) => {
               alignItems: 'center',
             }}
           >
-            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-              <LockOutlinedIcon />
-            </Avatar>
+            <AvatarImage
+              src={previewImg}
+              onClick={() => {
+                console.log('imageRef.current', imageRef.current);
+                if (!imageRef.current) return;
+                if (!isRegisterTypePage) return;
+
+                imageRef.current.click();
+              }}
+              isShowAddAvatar={isRegisterTypePage}
+              // sx={{ m: 1, bgcolor: 'primary.main' }}
+            >
+              {isRegisterTypePage ? (
+                <div>
+                  <PersonAddAltIcon
+                    sx={{
+                      cursor: 'pointer',
+                    }}
+                  />
+                </div>
+              ) : (
+                <LockOutlinedIcon />
+              )}
+            </AvatarImage>
+            <input
+              type="file"
+              onChange={handleChangeFile}
+              accept=".jpg,.png,.jpeg"
+              ref={imageRef}
+              style={{ display: 'none' }}
+            />
             <Typography component="h1" variant="h5">
               Sign {isRegisterTypePage ? 'up' : 'in'}
             </Typography>

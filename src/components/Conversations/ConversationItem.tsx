@@ -1,7 +1,9 @@
+import { AvatarUser } from '@/common/AvatarUser/AvatarUser';
 import UserService from '@/services/UserService';
 import { Nullable } from '@/types/Nullable';
 import { User } from '@/types/user';
 import Skeleton from '@mui/material/Skeleton';
+import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 
 interface ConversationItemProps {
@@ -54,7 +56,24 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
         width: '100%',
       }}
     >
-      {`${userData?.name} ${userData?.surname}`}
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
+        {userData?.avatarUrl && <AvatarUser url={userData.avatarUrl} />}
+        <p
+          style={{
+            marginLeft: '10px',
+          }}
+        >
+          {' '}
+          {`${userData?.name} ${userData?.surname}`}
+        </p>
+      </div>
+
       {isOnline && <span>Online</span>}
     </div>
   );

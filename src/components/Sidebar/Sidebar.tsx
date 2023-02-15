@@ -18,6 +18,7 @@ import { Conversations } from '../Conversations/Conversations';
 import { useAuth } from '@/context/AuthContext';
 import { useInterlocutorData } from '@/context/InterlocutorContext';
 import { SearchUserModal } from '../SearchUserModal/SearchUserModal';
+import Image from 'next/image';
 
 interface SidebarProps {
   chats: any[];
@@ -64,9 +65,13 @@ export const Sidebar = ({
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap component="div">
-            {interlocutorData
-              ? `${interlocutorData?.name} ${interlocutorData?.surname}`
-              : ''}
+            {interlocutorData ? (
+              <div>
+                {`${interlocutorData?.name} ${interlocutorData?.surname}`}
+              </div>
+            ) : (
+              ''
+            )}
           </Typography>
         </Toolbar>
       </AppBar>

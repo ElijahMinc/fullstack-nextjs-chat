@@ -5,6 +5,7 @@ const { body } = require('express-validator');
 const authMiddleware = require('../middleware/auth-middleware');
 const MessageController = require('../controller/message-controller');
 const ChatController = require('../controller/chat-contoller');
+const upload = require('../utils/multer');
 
 //Message
 router.post('/message/', MessageController.addMessage);
@@ -20,6 +21,7 @@ router.delete(('/chat/:chatId', ChatController.deleteChat));
 
 router.post(
   '/auth/registration',
+  upload.single('image'),
   body('name').isLength({ min: 3, max: 15 }),
   body('surname').isLength({ min: 3, max: 15 }),
   body('email').isEmail(),

@@ -14,11 +14,18 @@ class UserController {
       }
 
       const { email, password, name, surname } = req.body;
+      const image = req?.file ?? '';
+
+      if (image && image.size >= 524288) {
+        return next(ApiError.BadRequest('File is very big', errors.array()));
+      }
+
       const userData = await userService.registration({
         email,
         password,
         name,
         surname,
+        image,
       });
 
       res.cookie('refreshToken', userData.refreshToken, {

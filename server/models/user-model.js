@@ -19,9 +19,12 @@ const UserSchema = new Schema(
       type: String,
       require: true,
     },
-    photoUrl: {
+    avatarUrl: {
       type: String,
       default: '',
+    },
+    cloudinaryId: {
+      type: String,
     },
   },
   {

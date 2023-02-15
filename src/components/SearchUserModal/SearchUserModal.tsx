@@ -9,6 +9,8 @@ import UserService from '@/services/UserService';
 import ChatService from '@/services/ChatService';
 import { User } from '@/types/user';
 import { Nullable } from '@/types/Nullable';
+import Image from 'next/image';
+import { AvatarUser } from '@/common/AvatarUser/AvatarUser';
 
 interface SearchUserModalProps {
   isOpen: boolean;
@@ -97,8 +99,17 @@ export const SearchUserModal: React.FC<SearchUserModalProps> = ({
           users.map((user) => {
             return (
               <ListItem key={user._id} disablePadding>
-                <ListItemButton onClick={() => setInterlocutorId(user._id)}>
-                  {`${user.name} ${user.surname}`}
+                <ListItemButton
+                  onClick={() => setInterlocutorId(user._id)}
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-start',
+                    alignItems: 'center',
+                    gap: '10px',
+                  }}
+                >
+                  <AvatarUser url={user.avatarUrl} />
+                  <p>{`${user.name} ${user.surname}`}</p>
                 </ListItemButton>
               </ListItem>
             );
