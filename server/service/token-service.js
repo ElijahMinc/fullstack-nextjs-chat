@@ -3,11 +3,9 @@ const tokenModel = require('../models/token-model');
 
 class TokenService {
   generateTokens(payload) {
-    console.log('NEXT_JWT_ACCESS_SECRET', process.env.NEXT_JWT_ACCESS_SECRET);
     const accessToken = jwt.sign(payload, process.env.NEXT_JWT_ACCESS_SECRET, {
       expiresIn: '24h',
     });
-    console.log('NEXT_JWT_ACCESS_SECRET', process.env.NEXT_JWT_REFRESH_SECRET);
 
     const refreshToken = jwt.sign(
       payload,

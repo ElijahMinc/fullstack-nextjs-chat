@@ -1,80 +1,31 @@
-import {
-  Box,
-  Button,
-  Divider,
-  Drawer,
-  IconButton,
-  Toolbar,
-  Typography,
-} from '@mui/material';
+import { Box, Button, Divider, Drawer, IconButton } from '@mui/material';
 import { GetServerSideProps } from 'next';
-import { useState } from 'react';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import { DrawerHeader } from '@/common/DrawerHeader/DrawerHeader';
 import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
-import { AppBar } from '@/common/AppBar/AppBar';
-import MenuIcon from '@mui/icons-material/Menu';
 import { Conversations } from '../Conversations/Conversations';
 import { useAuth } from '@/context/AuthContext';
 import { useInterlocutorData } from '@/context/InterlocutorContext';
-import { SearchUserModal } from '../SearchUserModal/SearchUserModal';
-import Image from 'next/image';
 
 interface SidebarProps {
   chats: any[];
-  fetchChats: () => void;
-  open: boolean;
+  isDrawerOpen: boolean;
   handleDrawerClose: () => void;
-  handleDrawerOpen: () => void;
-  addedUserIds: string[];
+  handleOpenModal: () => void;
 }
 export const drawerWidth = 340;
 
 export const Sidebar = ({
   chats,
-  open,
-  addedUserIds,
-  fetchChats,
+  isDrawerOpen,
   handleDrawerClose,
-  handleDrawerOpen,
+  handleOpenModal,
 }: SidebarProps) => {
-  const [openModal, setOpenModal] = useState(false);
-
-  const handleCloseModal = () => setOpenModal(false);
-
   const { logoutAuth } = useAuth();
   const { interlocutorData } = useInterlocutorData();
 
   return (
     <>
-      <SearchUserModal
-        isOpen={openModal}
-        addedUserIds={addedUserIds}
-        refetchChats={fetchChats}
-        handleCancel={handleCloseModal}
-      />
-
-      <AppBar position="fixed" open={open}>
-        <Toolbar>
-          <IconButton
-            color="inherit"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{ mr: 2, ...(open && { display: 'none' }) }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" noWrap component="div">
-            {interlocutorData ? (
-              <div>
-                {`${interlocutorData?.name} ${interlocutorData?.surname}`}
-              </div>
-            ) : (
-              ''
-            )}
-          </Typography>
-        </Toolbar>
-      </AppBar>
       <Drawer
         sx={{
           width: drawerWidth,
@@ -86,7 +37,7 @@ export const Sidebar = ({
         }}
         variant="persistent"
         anchor="left"
-        open={open}
+        open={isDrawerOpen}
       >
         <DrawerHeader
           sx={{
@@ -99,12 +50,8 @@ export const Sidebar = ({
           <IconButton onClick={logoutAuth}>
             <PowerSettingsNewIcon color="error" />
           </IconButton>
-          <Button
-            fullWidth
-            variant="contained"
-            onClick={() => setOpenModal(true)}
-          >
-            User Search
+          <Button fullWidth variant="contained" onClick={handleOpenModal}>
+            Search Users
           </Button>
           <IconButton onClick={handleDrawerClose}>
             <ChevronLeftIcon />

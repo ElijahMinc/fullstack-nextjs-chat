@@ -9,7 +9,7 @@ interface ChatBySenderIdAndReceiverIdRequest {
   receiverId: User['_id'];
 }
 
-interface AddNewMessageRequest {
+export interface AddNewMessageRequest {
   senderId: User['_id'];
   receiverId: User['_id'];
   chatId: Nullable<Chat['_id']>;

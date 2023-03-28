@@ -1,5 +1,5 @@
-import { drawerWidth } from "@/components/Sidebar/Sidebar";
-import { styled } from "@mui/material";
+import { drawerWidth } from '@/components/Sidebar/Sidebar';
+import { styled } from '@mui/material';
 
 export const ChatContainer = styled('div', {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -7,7 +7,8 @@ export const ChatContainer = styled('div', {
   open?: boolean;
 }>(({ theme, open }) => ({
   flexGrow: 1,
-  padding: theme.spacing(3),
+  padding: 0,
+  height: 'calc(100% - 80px)',
   transition: theme.transitions.create('margin', {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,

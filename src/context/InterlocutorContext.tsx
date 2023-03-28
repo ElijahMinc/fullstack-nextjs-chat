@@ -39,7 +39,7 @@ export const InterlocutorProvider = ({
     }
   }, []);
 
-  console.log('selectedChat', selectedChat);
+
   useEffect(() => {
     if (!user) return;
     if (!selectedChat) return;

@@ -5,8 +5,8 @@ class MessageController {
   async addMessage(req, res) {
     const { chatId: chatIdFromBody, senderId, receiverId, text } = req.body;
     console.log('chatIdFromBody', chatIdFromBody);
-    let chatId = await ChatModel.findById(chatIdFromBody);
-
+    const chat = await ChatModel.findById(chatIdFromBody);
+    let chatId = chat?._id ?? null;
     let isNewChatCreated = false;
 
     if (!chatId) {

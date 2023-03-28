@@ -43,7 +43,7 @@ export const Messages: React.FC<MessagesProps> = ({
 
     scroll.current.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-  console.log('interlocutorData', interlocutorData);
+
   return (
     <MessageBody>
       {messages.map((message) => (

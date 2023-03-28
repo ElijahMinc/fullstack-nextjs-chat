@@ -15,8 +15,8 @@ class UserController {
 
       const { email, password, name, surname } = req.body;
       const image = req?.file ?? '';
-
-      if (image && image.size >= 524288) {
+      console.log('image.size', image.size);
+      if (image && image.size >= 775481) { // 0.7 мб
         return next(ApiError.BadRequest('File is very big', errors.array()));
       }
 

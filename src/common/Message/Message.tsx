@@ -1,5 +1,6 @@
 import React from 'react';
 import { styled } from '@mui/material';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const MessageRow = styled('div')(({ theme }) => ({
   display: 'flex',
@@ -123,9 +124,14 @@ export const MessageLeft = ({
   return (
     <>
       <MessageRow>
-        <ImageOrange src={photoURL ?? ''}></ImageOrange>
+        <ImageOrange
+          src={
+            photoURL ||
+            'https://w7.pngwing.com/pngs/754/2/png-transparent-samsung-galaxy-a8-a8-user-login-telephone-avatar-pawn-blue-angle-sphere-thumbnail.png'
+          }
+        ></ImageOrange>
         <div>
-          <DisplayName>{displayName ?? ''}</DisplayName>
+          <DisplayName>{displayName || ''}</DisplayName>
           <MessageBlue>
             <div>
               <MessageContent>{message}</MessageContent>

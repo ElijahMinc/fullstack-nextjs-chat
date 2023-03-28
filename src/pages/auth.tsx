@@ -31,7 +31,6 @@ export const AvatarImage = styled(Avatar, {
   shouldForwardProp: (prop) => prop !== 'isShowAddAvatar',
 })<AvatarImageProps>(({ theme, isShowAddAvatar }) => ({
   position: 'relative',
-  // backgroundColor: theme.palette.background.paper,
   cursor: 'pointer',
   borderRadius: '50%',
   zIndex: 2,
@@ -39,28 +38,6 @@ export const AvatarImage = styled(Avatar, {
     theme.palette.mode === 'dark'
       ? theme.palette.primary.light
       : theme.palette.primary.dark,
-  // ...(isShowAddAvatar && {
-  //   '&:after': {
-  //     content: '"+"',
-  //     position: 'absolute',
-  //     bottom: -2,
-  //     right: 0,
-  //     // transform: 'translateX(50%)',
-  //     zIndex: 1,
-  //     width: '10px',
-  //     height: '10px',
-  //     fontSize: '16px',
-  //     backgroundColor:
-  //       theme.palette.mode === 'dark'
-  //         ? theme.palette.primary.light
-  //         : theme.palette.primary.dark,
-  //     borderRadius: '50%',
-  //     display: isShowAddAvatar ? 'flex' : 'none',
-  //     justifyContent: 'center',
-  //     alignItems: 'center',
-  //     padding: '7px',
-  //   },
-  // }),
 }));
 
 interface AuthProps {
@@ -111,9 +88,8 @@ const Auth = ({ setIsAuth, setUser }: AuthProps) => {
       query: { type: isRegisterTypePage ? 'login' : 'register' },
     });
   };
-  console.log('values', values);
+
   const handleChangeFile = (e: ChangeEvent<HTMLInputElement>) => {
-    // debugger;
     if (imageRef.current && !!imageRef.current.value) {
       setPreview('');
       setFieldValue('image', '');
@@ -193,7 +169,6 @@ const Auth = ({ setIsAuth, setUser }: AuthProps) => {
             <AvatarImage
               src={previewImg}
               onClick={() => {
-                console.log('imageRef.current', imageRef.current);
                 if (!imageRef.current) return;
                 if (!isRegisterTypePage) return;
 

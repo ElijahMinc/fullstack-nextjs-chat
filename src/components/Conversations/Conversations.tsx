@@ -2,6 +2,7 @@ import { socket } from '@/config/socket';
 import { useAuth } from '@/context/AuthContext';
 import { useInterlocutorData } from '@/context/InterlocutorContext';
 import { Chat } from '@/types/conversations';
+import { SOCKET_ON_KEYS } from '@/types/socket';
 import { User } from '@/types/user';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
@@ -20,7 +21,7 @@ export const Conversations: React.FC<ConversationsProps> = ({ chats }) => {
   const [onlineUsers, setOnlineUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    socket.on('get-users', (users: User[]) => {
+    socket.on(SOCKET_ON_KEYS['GET:USERS'], (users: User[]) => {
       setOnlineUsers(users);
     });
   }, []);

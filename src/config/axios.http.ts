@@ -43,7 +43,7 @@ $AuthApi.interceptors.response.use(
     if (err.response.status !== 401) {
       throw err; // ошибка у которой не 401 статус-код
     }
-    console.log(originalRequest);
+
     if (_isRetry) {
       // originalRequest.headers._isRetry = null;
       _isRetry = false;

@@ -11,37 +11,37 @@ import { User } from '@/types/user';
 import { Nullable } from '@/types/Nullable';
 import Image from 'next/image';
 import { AvatarUser } from '@/common/AvatarUser/AvatarUser';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { AddNewMessageRequest } from '@/services/MessageService';
 
 interface SearchUserModalProps {
   isOpen: boolean;
   addedUserIds: string[];
-  refetchChats: () => void;
-  handleCancel: () => void;
+  handleCloseModal: () => void;
 }
 
 export const SearchUserModal: React.FC<SearchUserModalProps> = ({
   isOpen,
   addedUserIds,
-  refetchChats,
-  handleCancel,
+  handleCloseModal,
 }) => {
-  const { handleSelectedChat, handleInterlocutorData, interlocutorData } =
-    useInterlocutorData();
+  const queryClient = useQueryClient();
+  const { handleSelectedChat, handleInterlocutorData } = useInterlocutorData();
   const { user: authUser } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [interlocutorId, setInterlocutorId] =
     useState<Nullable<User['_id']>>(null);
 
-  const fetchUsers = async () => {
-    if (!authUser) return;
+  useQuery('', () => UserService.getAllUsers(), {
+    onSuccess: async (users) => {
+      if (!authUser) return;
+      if (!users) return;
 
-    const users = await UserService.getAllUsers();
-
-    if (!users) return;
-
-    const usersWithoutMe = users.filter((user) => user._id !== authUser._id);
-    setUsers(usersWithoutMe);
-  };
+      const usersWithoutMe = users.filter((user) => user._id !== authUser._id);
+      setUsers(usersWithoutMe);
+    },
+    enabled: isOpen,
+  });
 
   const selectUser = async (receiverId: string) => {
     if (!authUser) return;
@@ -64,10 +64,10 @@ export const SearchUserModal: React.FC<SearchUserModalProps> = ({
 
       handleInterlocutorData(receiverUserData);
       handleSelectedChat(currentChat);
-      handleCancel();
-      refetchChats();
       setInterlocutorId(null);
+      queryClient.invalidateQueries(ChatService.uniqueName);
 
+      handleCloseModal();
       return;
     }
 
@@ -77,14 +77,11 @@ export const SearchUserModal: React.FC<SearchUserModalProps> = ({
 
     handleInterlocutorData(receiverUserData);
     handleSelectedChat(null);
-    handleCancel();
-    refetchChats();
     setInterlocutorId(null);
-  };
+    queryClient.invalidateQueries(ChatService.uniqueName);
 
-  useEffect(() => {
-    isOpen && fetchUsers();
-  }, [isOpen]);
+    handleCloseModal();
+  };
 
   useEffect(() => {
     if (!interlocutorId) return;
@@ -93,7 +90,7 @@ export const SearchUserModal: React.FC<SearchUserModalProps> = ({
   }, [interlocutorId]);
 
   return (
-    <Modal open={isOpen} title="title" handleCancel={handleCancel}>
+    <Modal open={isOpen} title="title" handleCancel={handleCloseModal}>
       <List>
         {!!users.length &&
           users.map((user) => {
