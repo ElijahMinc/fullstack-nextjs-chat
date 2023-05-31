@@ -8,7 +8,7 @@ const ChatController = require('../controller/chat-contoller');
 const upload = require('../utils/multer');
 
 //Message
-router.post('/message/', MessageController.addMessage);
+router.post('/message/', upload.array('images'), MessageController.addMessage);
 
 router.get('/message/:chatId', MessageController.getMessages);
 
@@ -44,5 +44,6 @@ router.delete('/auth/logout', userController.logout); // для рефреш т�
 router.get('/activate/:link', userController.activate); // для активации аккаунта по ссылке
 router.get('/users', authMiddleware, userController.getUsers); // тестовый енд для получения списка юзера
 router.get('/users/:id', authMiddleware, userController.getUserById); // тестовый енд для получения списка юзера
+router.put('/users/:id', authMiddleware, userController.updateUser); // тестовый енд для получения списка юзера
 
 module.exports = router;

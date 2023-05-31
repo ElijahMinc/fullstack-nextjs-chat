@@ -72,28 +72,6 @@ const MessageOrange = styled('div')(({ theme }) => ({
   border: '1px solid #dfd087',
   borderRadius: '10px',
   borderTopRightRadius: '0px',
-  // '&:after': {
-  //   content: "''",
-  //   position: 'absolute',
-  //   width: '0',
-  //   height: '0',
-  //   borderTop: '15px solid #f8e896',
-  //   borderLeft: '15px solid transparent',
-  //   borderRight: '15px solid transparent',
-  //   top: '0',
-  //   right: '-15px',
-  // },
-  // '&:before': {
-  //   content: "''",
-  //   position: 'absolute',
-  //   width: '0',
-  //   height: '0',
-  //   borderTop: '17px solid #dfd087',
-  //   borderLeft: '16px solid transparent',
-  //   borderRight: '16px solid transparent',
-  //   top: '-1px',
-  //   right: '-17px',
-  // },
 }));
 
 const ImageOrange = styled('img')(({ theme }) => ({
@@ -113,6 +91,7 @@ export interface MessageProps {
 export interface MessageLeft extends MessageProps {
   photoURL: string | undefined;
   displayName: string | undefined;
+  files: { id: string; base64Url: string }[];
 }
 
 export const MessageLeft = ({
@@ -120,6 +99,7 @@ export const MessageLeft = ({
   message,
   photoURL,
   timestamp,
+  files,
 }: MessageLeft) => {
   return (
     <>
@@ -134,6 +114,17 @@ export const MessageLeft = ({
           <DisplayName>{displayName || ''}</DisplayName>
           <MessageBlue>
             <div>
+              <>
+                {!!files.length &&
+                  files.map((file) => {
+                    <img
+                      key={file.id}
+                      width={25}
+                      height={25}
+                      src={file.base64Url}
+                    />;
+                  })}
+              </>
               <MessageContent>{message}</MessageContent>
             </div>
             <MessageTimeStampRight>{timestamp}</MessageTimeStampRight>
@@ -147,12 +138,20 @@ export const MessageLeft = ({
 export interface MessageRight {
   message: string | undefined;
   timestamp: string | undefined;
+  files: { id: string; base64Url: string }[];
 }
-export const MessageRight = ({ message, timestamp }: MessageRight) => {
+export const MessageRight = ({ message, files, timestamp }: MessageRight) => {
   return (
     <MessageRowRight>
       <MessageOrange>
+        <>
+          {!!files.length &&
+            files.map((file) => {
+              <img key={file.id} width={25} height={25} src={file.base64Url} />;
+            })}
+        </>
         <MessageContent>{message ?? 'no message :C'}</MessageContent>
+
         <MessageTimeStampRight>
           {timestamp ?? 'no timestamp :C'}
         </MessageTimeStampRight>

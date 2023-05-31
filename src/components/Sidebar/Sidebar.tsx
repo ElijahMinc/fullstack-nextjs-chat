@@ -1,18 +1,30 @@
-import { Box, Button, Divider, Drawer, IconButton } from '@mui/material';
+import { Box, Divider, Drawer } from '@mui/material';
 import { GetServerSideProps } from 'next';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { DrawerHeader } from '@/common/DrawerHeader/DrawerHeader';
-import PowerSettingsNewIcon from '@mui/icons-material/PowerSettingsNew';
 import { Conversations } from '../Conversations/Conversations';
-import { useAuth } from '@/context/AuthContext';
-import { useInterlocutorData } from '@/context/InterlocutorContext';
+import { styled } from '@mui/material';
+import { SidebarHeader } from '../SidebarHeader/SidebarHeader';
+import { Chat } from '@/types/conversations';
 
 interface SidebarProps {
-  chats: any[];
+  chats: Chat[];
   isDrawerOpen: boolean;
   handleDrawerClose: () => void;
   handleOpenModal: () => void;
 }
+
+export const SidebarDrawer = styled(Drawer, {
+  shouldForwardProp: (prop) => prop !== 'drawerWidth',
+})<{ drawerWidth: number }>(({ theme, drawerWidth }) => ({
+  ...(drawerWidth && {
+    width: drawerWidth,
+    flexShrink: 0,
+    '& .MuiDrawer-paper': {
+      width: drawerWidth,
+      boxSizing: 'border-box',
+    },
+  }),
+}));
+
 export const drawerWidth = 340;
 
 export const Sidebar = ({
@@ -21,55 +33,29 @@ export const Sidebar = ({
   handleDrawerClose,
   handleOpenModal,
 }: SidebarProps) => {
-  const { logoutAuth } = useAuth();
-  const { interlocutorData } = useInterlocutorData();
-
   return (
-    <>
-      <Drawer
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: drawerWidth,
-            boxSizing: 'border-box',
-          },
-        }}
-        variant="persistent"
-        anchor="left"
-        open={isDrawerOpen}
+    <SidebarDrawer
+      drawerWidth={drawerWidth}
+      variant="persistent"
+      anchor="left"
+      open={isDrawerOpen}
+    >
+      <SidebarHeader
+        handleOpenModal={handleOpenModal}
+        handleDrawerClose={handleDrawerClose}
+      />
+      <Divider />
+      <Box
+        component="div"
+        position="relative"
+        display="flex"
+        flexDirection="column"
+        justifyContent="flex-start"
+        height="100%"
       >
-        <DrawerHeader
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '10px',
-          }}
-        >
-          <IconButton onClick={logoutAuth}>
-            <PowerSettingsNewIcon color="error" />
-          </IconButton>
-          <Button fullWidth variant="contained" onClick={handleOpenModal}>
-            Search Users
-          </Button>
-          <IconButton onClick={handleDrawerClose}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </DrawerHeader>
-        <Divider />
-        <Box
-          component="div"
-          position="relative"
-          display="flex"
-          flexDirection="column"
-          justifyContent="flex-start"
-          height="100%"
-        >
-          <Conversations chats={chats} />
-        </Box>
-      </Drawer>
-    </>
+        <Conversations chats={chats} />
+      </Box>
+    </SidebarDrawer>
   );
 };
 

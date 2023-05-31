@@ -1,37 +1,41 @@
 import { socket } from '@/config/socket';
 import { useAuth } from '@/context/AuthContext';
 import { useInterlocutorData } from '@/context/InterlocutorContext';
+import { useUserByIdQuery } from '@/hooks/useUserByIdQuery';
+import UserService from '@/services/UserService';
 import { Chat } from '@/types/conversations';
 import { SOCKET_ON_KEYS } from '@/types/socket';
 import { User } from '@/types/user';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
-import ListItemText from '@mui/material/ListItemText';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { ConversationItem } from './ConversationItem';
 
 interface ConversationsProps {
   chats: any[];
 }
 
-export const Conversations: React.FC<ConversationsProps> = ({ chats }) => {
+export const Conversations: React.FC<ConversationsProps> = memo(({ chats }) => {
   const { user } = useAuth();
   const { handleSelectedChat, interlocutorData } = useInterlocutorData();
-  const [onlineUsers, setOnlineUsers] = useState<User[]>([]);
+  const [onlineUsers, setOnlineUsers] = useState<
+    { socketId: string; userId: User['_id'] }[]
+  >([]);
 
   useEffect(() => {
-    socket.on(SOCKET_ON_KEYS['GET:USERS'], (users: User[]) => {
-      setOnlineUsers(users);
-    });
+    socket.on(
+      SOCKET_ON_KEYS['GET:USERS'],
+      (users: { socketId: string; userId: User['_id'] }[]) => {
+        setOnlineUsers(users);
+      }
+    );
   }, []);
 
   const checkOnlineStatus = (chat: Chat): boolean => {
     if (!user) return false;
-    const chatMember = chat.members.find((member: any) => member !== user._id);
-    const online: any = onlineUsers.find(
-      (user: any) => user.userId === chatMember
-    );
+    const chatMember = chat.members.find((member) => member !== user._id);
+    const online = onlineUsers.find((user) => user.userId === chatMember);
     return online ? true : false;
   };
 
@@ -64,4 +68,4 @@ export const Conversations: React.FC<ConversationsProps> = ({ chats }) => {
       })}
     </List>
   );
-};
+});

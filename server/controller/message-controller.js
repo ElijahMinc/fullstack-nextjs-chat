@@ -9,6 +9,8 @@ class MessageController {
     let chatId = chat?._id ?? null;
     let isNewChatCreated = false;
 
+    const images = req?.file ?? '';
+    console.log('images', images);
     if (!chatId) {
       const newChat = new ChatModel({
         members: [req.body.senderId, req.body.receiverId],

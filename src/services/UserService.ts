@@ -9,11 +9,17 @@ interface AuthRequest {
 }
 
 class UsersService extends CrudService {
-  public uniqueName: string;
+  public uniqueKey: string;
+  public uniqueKeyInterlocutor: string;
+  public uniqueKeyUserById: string;
+  public uniqueKeyPersonId: string;
 
   constructor() {
     super('users');
-    this.uniqueName = 'users';
+    this.uniqueKey = 'users';
+    this.uniqueKeyInterlocutor = 'users:id';
+    this.uniqueKeyUserById = 'user:id';
+    this.uniqueKeyPersonId = 'person:id';
   }
 
   public async getUserById(
@@ -41,6 +47,26 @@ class UsersService extends CrudService {
     route?: string
   ) {
     const response = await this.getAll<UserReponse[]>(routeParams, route);
+
+    if ('error' in response) {
+      const message = response.message;
+
+      return null;
+    }
+
+    return response;
+  }
+
+  public async updateUser(
+    data: Pick<User, 'name' | 'surname'>,
+    routeParams?: { [key: string]: string },
+    route?: string
+  ) {
+    const response = await this.update<Pick<User, 'name' | 'surname'>, User>(
+      data,
+      routeParams,
+      route
+    );
 
     if ('error' in response) {
       const message = response.message;

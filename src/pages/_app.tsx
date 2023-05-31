@@ -21,7 +21,7 @@ export const QueryClientWithConfig = () =>
 
 const App = ({ Component, pageProps }: AppProps) => {
   const [queryClient] = useState(QueryClientWithConfig);
-
+  console.log('here');
   return (
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>

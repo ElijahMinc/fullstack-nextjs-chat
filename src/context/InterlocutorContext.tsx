@@ -1,10 +1,8 @@
-import UserService from '@/services/UserService';
+import { useInterlocutorQuery } from '@/hooks/useInterlocutorQuery';
 import { Chat } from '@/types/conversations';
 import { Nullable } from '@/types/Nullable';
 import { User } from '@/types/user';
-import { useRouter } from 'next/router';
-import { createContext, useState, useEffect, useMemo, useContext } from 'react';
-import { useAuth } from './AuthContext';
+import { createContext, useMemo, useContext } from 'react';
 
 export interface AuthProviderProps {
   interlocutorData: Nullable<User>;
@@ -24,59 +22,12 @@ interface InterlocutorProviderContextComponentProps {
 export const InterlocutorProvider = ({
   children,
 }: InterlocutorProviderContextComponentProps) => {
-  const route = useRouter();
-  const { user } = useAuth();
-  const [interlocutorData, setInterlocutorData] =
-    useState<Nullable<User>>(null);
-  const [selectedChat, setSelectedChat] = useState<Nullable<Chat>>(null);
-
-  useEffect(() => {
-    const selectedChatFromLocalStorage = localStorage.getItem('selectedChat')
-      ? JSON.parse(localStorage.getItem('selectedChat') as string)
-      : null;
-    if (!!selectedChatFromLocalStorage) {
-      setSelectedChat(selectedChatFromLocalStorage);
-    }
-  }, []);
-
-
-  useEffect(() => {
-    if (!user) return;
-    if (!selectedChat) return;
-
-    const userId = selectedChat.members.find((id: string) => id !== user._id);
-
-    if (!userId) return;
-
-    const getUserData = async () => {
-      try {
-        const interlocutorData = await UserService.getUserById(userId);
-        setInterlocutorData(interlocutorData);
-        route.push({
-          query: {
-            chatId: selectedChat._id,
-          },
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    getUserData();
-  }, [selectedChat]);
-
-  const handleInterlocutorData = (data: Nullable<User>) =>
-    setInterlocutorData(data);
-
-  const handleSelectedChat = (chat: Nullable<Chat>) => {
-    if (!chat) {
-      localStorage.removeItem('selectedChat');
-    } else {
-      localStorage.setItem('selectedChat', JSON.stringify(chat));
-    }
-
-    setSelectedChat(chat);
-  };
+  const {
+    handleInterlocutorData,
+    handleSelectedChat,
+    interlocutorData,
+    selectedChat,
+  } = useInterlocutorQuery();
 
   const value = useMemo(
     () => ({

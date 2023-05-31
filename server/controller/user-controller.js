@@ -2,6 +2,7 @@ const userService = require('../service/user-service');
 const { validationResult } = require('express-validator');
 const ApiError = require('../exceptions/api-error');
 
+const thirtyDays = 30 * 24 * 60 * 10 * 1000; // 30d
 class UserController {
   async registration(req, res, next) {
     try {
@@ -16,7 +17,8 @@ class UserController {
       const { email, password, name, surname } = req.body;
       const image = req?.file ?? '';
       console.log('image.size', image.size);
-      if (image && image.size >= 775481) { // 0.7 мб
+      if (image && image.size >= 775481) {
+        // 0.7 мб
         return next(ApiError.BadRequest('File is very big', errors.array()));
       }
 
@@ -29,7 +31,7 @@ class UserController {
       });
 
       res.cookie('refreshToken', userData.refreshToken, {
-        maxAge: 30 * 24 * 60 * 10 * 1000, // 30d
+        maxAge: thirtyDays, // 30d
         httpOnly: true, // Эти куки нельзя получать из браузера с помощью js
       });
 
@@ -59,7 +61,7 @@ class UserController {
       });
 
       res.cookie('refreshToken', userData.refreshToken, {
-        maxAge: 30 * 24 * 60 * 10 * 1000, // 30d
+        maxAge: thirtyDays, // 30d,
         httpOnly: true, // Эти куки нельзя получать из браузера с помощью js
       });
 
@@ -96,11 +98,11 @@ class UserController {
   async refresh(req, res, next) {
     try {
       const { refreshToken } = req.cookies;
-      console.log('refreshToken', refreshToken);
+
       const userData = await userService.refresh(refreshToken);
       res.cookie('refreshToken', userData.refreshToken, {
-        maxAge: 30 * 24 * 60 * 10 * 1000, // 30d
-        httpOnly: true, // Эти куки нельзя получать из браузера с помощью js
+        maxAge: thirtyDays, 
+        httpOnly: true,
       });
 
       return res.json(userData);
@@ -115,6 +117,19 @@ class UserController {
       const users = await userService.getAllUsers();
 
       res.json(users);
+    } catch (e) {
+      console.log(e);
+      next(e);
+    }
+  }
+
+  async updateUser(req, res, next) {
+    try {
+      const userId = req.params.id;
+      const data = req.body;
+      const user = await userService.updateUser(userId, data);
+
+      res.json(user);
     } catch (e) {
       console.log(e);
       next(e);

@@ -6,41 +6,167 @@ import {
   LocalStorageService,
 } from '@/services/LocalStorageService';
 import { CssBaseline, PaletteMode } from '@mui/material';
-import { amber, deepOrange, grey } from '@mui/material/colors';
+import { amber, deepOrange, grey, orange } from '@mui/material/colors';
 import { setCookie, getCookie } from 'cookies-next';
 
 export interface ThemedProviderProps {
   handleToggleTheme: () => void;
   toggleTheme: PaletteMode | undefined;
 }
+declare module '@mui/material/Button' {
+  interface ButtonPropsVariantOverrides {
+    dashed: true;
+  }
+}
+
+const defaultThemeLight = createTheme({
+  components: {
+    MuiButton: {
+      variants: [
+        {
+          props: { variant: 'dashed' },
+          style: {
+            textTransform: 'none',
+            border: `2px dashed ${deepOrange}`,
+            color: '#fff',
+          },
+        },
+        {
+          props: { variant: 'dashed', size: 'large' },
+          style: {
+            borderWidth: 4,
+          },
+        },
+        {
+          props: { variant: 'dashed', color: 'secondary', size: 'large' },
+          style: {
+            fontSize: 18,
+          },
+        },
+      ],
+    },
+    MuiTextField: {
+      defaultProps: {
+        variant: 'outlined',
+        // size: 'small',
+        sx: {},
+        InputLabelProps: {
+          // fontSize: '10px',
+          sx: {
+            height: '5px',
+            fontWeight: 600,
+            fontSize: '15px',
+            lineHeight: '26px',
+            color: '#0C1628',
+            opacity: '0.5',
+          },
+        },
+        InputProps: {
+          sx: {
+            height: '10px',
+            fontWeight: 600,
+            fontSize: '20px',
+            lineHeight: '26px',
+            color: '#0C1628',
+            opacity: '0.5',
+          },
+
+          // disableUnderline: true,
+        },
+      },
+    },
+    // TextField: {
+    //   styleOverrides: {
+    //     // Name of the slot
+    //     defaultProps: {
+    //       // The props to change the default for.
+    //       // size: 'small', // No more ripple, on the whole application 💣!
+    //     },
+    //     root: {
+    //       // Some CSS
+    //       fontSize: '15px',
+    //     },
+    //   },
+    // },
+  },
+});
+
+const defaultThemeDark = createTheme({
+  components: {
+    MuiButton: {
+      variants: [
+        {
+          props: { variant: 'dashed' },
+          style: {
+            textTransform: 'none',
+            border: `2px dashed ${deepOrange}`,
+            color: '#fff',
+          },
+        },
+        {
+          props: { variant: 'dashed', size: 'large' },
+          style: {
+            borderWidth: 4,
+          },
+        },
+        {
+          props: { variant: 'dashed', color: 'secondary', size: 'large' },
+          style: {
+            fontSize: 18,
+          },
+        },
+      ],
+    },
+    MuiTextField: {
+      defaultProps: {
+        variant: 'outlined',
+        sx: {},
+        InputLabelProps: {
+          sx: {
+            fontWeight: 600,
+            fontSize: '15px',
+            lineHeight: '26px',
+            color: amber,
+            opacity: '0.5',
+          },
+          size: 'small',
+        },
+        InputProps: {
+          sx: {
+            fontWeight: 600,
+            fontSize: '20px',
+            lineHeight: '26px',
+            color: amber,
+            opacity: '0.5',
+          },
+          size: 'small',
+          // disableUnderline: true,
+        },
+      },
+    },
+  },
+});
 
 const getDesignTokens = (mode: PaletteMode) => ({
+  ...(mode === 'light'
+    ? {
+        ...defaultThemeLight,
+      }
+    : {
+        ...defaultThemeDark,
+      }),
+
   palette: {
     mode,
-
     ...(mode === 'light'
-      ? {
-          // palette values for light mode
-          // primary: amber,
-          // divider: amber[200],
-          // text: {
-          //   primary: grey[900],
-          //   secondary: grey[800],
-          // },
-        }
-      : {
-          // palette values for dark mode
-          // primary: deepOrange,
-          // divider: deepOrange[700],
-          // background: {
-          //   default: deepOrange[900],
-          //   paper: deepOrange[900],
-          // },
-          // text: {
-          //   primary: '#fff',
-          //   secondary: grey[500],
-          // },
-        }),
+      ? {}
+      : {}),
+  },
+  typography: {
+    fonSize: '15px',
+    button: {
+      fontSize: '10px',
+    },
   },
 });
 

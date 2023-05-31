@@ -38,13 +38,13 @@ class CrudService {
     return await this.httpRequest.post<TData, VoidR>(data, routeParams, route);
   }
 
-  protected async update<T>(
-    data: T,
+  protected async update<TData, ReturnV>(
+    data: TData,
     params?: { [key: string]: string },
     route?: string
   ) {
     const routeParams = getQueryParams(params ?? {});
-    return await this.httpRequest.put(data, routeParams, route);
+    return await this.httpRequest.put<TData, ReturnV>(data, routeParams, route);
   }
 
   protected async delete<VoidR>(

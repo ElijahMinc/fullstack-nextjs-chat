@@ -1,4 +1,5 @@
 import { createTheme } from '@mui/material';
+import { orange } from '@mui/material/colors';
 
 export const theme = createTheme({
   breakpoints: {
@@ -12,5 +13,12 @@ export const theme = createTheme({
   },
   palette: {
     mode: 'dark',
+    common: {},
+    primary: {
+      main: orange[500],
+      light: '#ef0a0a',
+      dark: '#662525',
+      contrastText: '#fff',
+    },
   },
 });

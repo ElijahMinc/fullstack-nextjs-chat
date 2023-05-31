@@ -17,6 +17,7 @@ import { styled } from '@mui/material';
 import { useRef, useState, ChangeEvent } from 'react';
 import { Nullable } from '@/types/Nullable';
 import { socket } from '@/config/socket';
+import { Input, InputField } from '@/common/Input/Input';
 
 enum AuthType {
   LOGIN = 'login',
@@ -75,7 +76,7 @@ const Auth = ({ setIsAuth, setUser }: AuthProps) => {
 
       setUser(user);
       setIsAuth();
-      socket.connect()
+      socket.connect();
       router.push({
         pathname: '/',
       });
@@ -205,7 +206,7 @@ const Auth = ({ setIsAuth, setUser }: AuthProps) => {
               onSubmit={handleSubmit}
               sx={{ mt: 1 }}
             >
-              <TextField
+              <Input
                 margin="normal"
                 required
                 fullWidth
@@ -216,7 +217,7 @@ const Auth = ({ setIsAuth, setUser }: AuthProps) => {
                 autoComplete="name"
                 autoFocus
               />
-              <TextField
+              <Input
                 margin="normal"
                 required
                 fullWidth
@@ -227,10 +228,11 @@ const Auth = ({ setIsAuth, setUser }: AuthProps) => {
                 id="surname"
                 autoComplete="csurname"
               />
-              <TextField
+              <Input
                 margin="normal"
                 required
                 fullWidth
+
                 id="email"
                 onChange={handleChange}
                 label="Email Address"
@@ -238,7 +240,7 @@ const Auth = ({ setIsAuth, setUser }: AuthProps) => {
                 autoComplete="email"
                 autoFocus
               />
-              <TextField
+              <Input
                 margin="normal"
                 required
                 fullWidth
@@ -251,6 +253,7 @@ const Auth = ({ setIsAuth, setUser }: AuthProps) => {
               />
               <Button
                 type="submit"
+                color="primary"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}

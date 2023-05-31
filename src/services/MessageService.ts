@@ -15,6 +15,7 @@ export interface AddNewMessageRequest {
   chatId: Nullable<Chat['_id']>;
   authorName: string;
   text: string;
+  files: { id: string; base64Url: string }[];
 }
 
 interface AddNewMessageResponse {
@@ -55,10 +56,17 @@ class MessageService extends CrudService {
     routeParams?: { [key: string]: string },
     params?: string
   ) {
-    const response = await this.create<
-      AddNewMessageRequest,
-      AddNewMessageResponse
-    >(data, routeParams, params);
+    const formData = new FormData();
+
+    Object.keys(data).forEach((key: keyof AddNewMessageRequest) => {
+      formData.append(key, data[key]);
+    });
+
+    const response = await this.create<FormData, AddNewMessageResponse>(
+      data,
+      routeParams,
+      params
+    );
 
     if ('error' in response) {
       const message = response.message;

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Sidebar } from '@/components/Sidebar/Sidebar';
 import { metaElementsForHomePage } from '@/config/meta/metaHomePage';
 import Box from '@mui/material/Box';
@@ -13,65 +13,53 @@ import { User } from '@/types/user';
 import { SOCKET_EMIT_KEYS } from '@/types/socket';
 import withCheckUser from '@/HOC/withCheckUser';
 import { useChatsQuery } from '@/hooks/useChatsQuery';
-import {
-  Button,
-  Divider,
-  Drawer,
-  IconButton,
-  Toolbar,
-  Typography,
-} from '@mui/material';
-import { AppBar } from '@/common/AppBar/AppBar';
-import MenuIcon from '@mui/icons-material/Menu';
 import { Header } from '@/components/Header';
 import { SearchUserModal } from '@/components/SearchUserModal/SearchUserModal';
 
 const Chat = ({ authUser }: { authUser: User }) => {
-  const { chats, addedUserIds, refetchChats } = useChatsQuery(authUser._id);
+  const { chats, addedUserIds } = useChatsQuery(authUser._id);
 
   const [headerOpen, setHeaderOpen] = useState(true);
-  const [openModal, setOpenModal] = useState(false);
+  const [openUsersModal, setOpenUsersModal] = useState(false);
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
-  };
+  const handleCloseUsersModal = useCallback(() => {
+    setOpenUsersModal(false);
+  }, []);
 
-  const handleHeaderOpen = () => {
+  const handleHeaderOpen = useCallback(() => {
     setHeaderOpen(true);
-  };
+  }, []);
 
-  const handleHeaderClose = () => {
+  const handleHeaderClose = useCallback(() => {
     setHeaderOpen(false);
-  };
+  }, []);
 
   useEffect(() => {
     socket.emit(SOCKET_EMIT_KEYS['NEW:USER:ADD'], authUser._id);
   }, [authUser]);
 
   return (
-    <>
+    <InterlocutorProvider>
       <HeadContent title="Title" metaElements={metaElementsForHomePage} />
       <Box padding="0px" sx={{ display: 'flex', padding: 0, height: '100%' }}>
-        <InterlocutorProvider>
-          <SearchUserModal
-            isOpen={openModal}
-            addedUserIds={addedUserIds}
-            handleCloseModal={handleCloseModal}
-          />
-          <Header isOpen={headerOpen} handleHeaderOpen={handleHeaderOpen} />
-          <Sidebar
-            chats={chats}
-            isDrawerOpen={headerOpen}
-            handleOpenModal={() => setOpenModal(true)}
-            handleDrawerClose={handleHeaderClose}
-          />
-          <ChatContainer open={headerOpen}>
-            <DrawerHeader />
-            <ChatBox />
-          </ChatContainer>
-        </InterlocutorProvider>
+        <SearchUserModal
+          isOpen={openUsersModal}
+          addedUserIds={addedUserIds}
+          handleCloseModal={handleCloseUsersModal}
+        />
+        <Header isHeaderOpen={headerOpen} handleHeaderOpen={handleHeaderOpen} />
+        <Sidebar
+          chats={chats}
+          isDrawerOpen={headerOpen}
+          handleOpenModal={() => setOpenUsersModal(true)}
+          handleDrawerClose={handleHeaderClose}
+        />
+        <ChatContainer open={headerOpen}>
+          <DrawerHeader />
+          <ChatBox />
+        </ChatContainer>
       </Box>
-    </>
+    </InterlocutorProvider>
   );
 };
 

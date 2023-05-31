@@ -13,7 +13,6 @@ export const useChatsQuery = (userId: User['_id']) => {
     isLoading,
     isSuccess,
     isError,
-    refetch: refetchChats,
   } = useQuery(
     [ChatService.uniqueName],
     () => ChatService.getChatsByUserId(userId),
@@ -30,7 +29,6 @@ export const useChatsQuery = (userId: User['_id']) => {
   return {
     chats,
     addedUserIds,
-    refetchChats,
     isLoading,
     isSuccess,
     isError,

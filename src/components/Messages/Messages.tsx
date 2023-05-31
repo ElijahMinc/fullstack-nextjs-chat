@@ -1,10 +1,11 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useLayoutEffect, LegacyRef } from 'react';
 import { styled } from '@mui/material';
 import { MessageLeft, MessageRight } from '@/common/Message/Message';
 import { Nullable } from '@/types/Nullable';
 import { Message } from '@/types/message';
 import { getDataFromCurrentMoment } from '@/utils/getDataFromCurrentMoment';
 import { useInterlocutorData } from '@/context/InterlocutorContext';
+import useStayScrolled from 'react-stay-scrolled';
 
 const MessageBody = styled('div')(({ theme }) => ({
   width: 'calc( 100% - 20px )',
@@ -31,25 +32,28 @@ interface MessagesProps {
   currentUserId: string;
 }
 
-export const Messages: React.FC<MessagesProps> = ({
-  messages,
-  currentUserId,
-}) => {
+export const Messages = ({ messages, currentUserId }: MessagesProps) => {
   const { interlocutorData } = useInterlocutorData();
-  const scroll = useRef<Nullable<HTMLDivElement>>(null);
-  const avatarMessageLeft = interlocutorData?.avatarUrl;
-  useEffect(() => {
-    if (!scroll.current) return;
 
-    scroll.current.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  const avatarMessageLeft = interlocutorData?.avatarUrl;
+  const scrollRef = useRef<Nullable<HTMLDivElement>>(null);
+  const { stayScrolled, scrollBottom } = useStayScrolled(scrollRef);
+
+  useLayoutEffect(() => {
+    scrollBottom();
+  }, []);
+
+  useLayoutEffect(() => {
+    stayScrolled();
+  }, [messages.length]);
 
   return (
-    <MessageBody>
+    <MessageBody ref={scrollRef}>
       {messages.map((message) => (
         <React.Fragment key={message._id}>
           {message.senderId === currentUserId ? (
             <MessageRight
+              files={message.files}
               message={message.text}
               timestamp={getDataFromCurrentMoment(message.createdAt)}
               // photoURL="https://lh3.googleusercontent.com/a-/AOh14Gi4vkKYlfrbJ0QLJTg_DLjcYyyK7fYoWRpz2r4s=s96-c"
@@ -58,13 +62,13 @@ export const Messages: React.FC<MessagesProps> = ({
             />
           ) : (
             <MessageLeft
+              files={message.files}
               message={message.text}
               timestamp={getDataFromCurrentMoment(message.createdAt)}
               photoURL={avatarMessageLeft}
               displayName={`${interlocutorData?.name} ${interlocutorData?.surname}`}
             />
           )}
-          <div ref={scroll} id="scrollIntoView"></div>
         </React.Fragment>
       ))}
     </MessageBody>

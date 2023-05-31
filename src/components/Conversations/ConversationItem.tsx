@@ -1,4 +1,6 @@
 import { AvatarUser } from '@/common/AvatarUser/AvatarUser';
+import { useInterlocutorData } from '@/context/InterlocutorContext';
+import { useUserByIdQuery } from '@/hooks/useUserByIdQuery';
 import UserService from '@/services/UserService';
 import { Nullable } from '@/types/Nullable';
 import { User } from '@/types/user';
@@ -15,26 +17,12 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
   interlocutorId,
   isOnline,
 }) => {
-  const [isLoading, setLoading] = useState(true);
-  const [userData, setUserData] = useState<Nullable<User>>(null);
+  const { isLoading, isSuccess, isFetching, userData } = useUserByIdQuery({
+    interlocutorId,
+    uniqueHash: UserService.uniqueKeyUserById + `/${interlocutorId}`,
+  });
 
-  useEffect(() => {
-    const getUserData = async () => {
-      try {
-        const user = await UserService.getUserById(interlocutorId);
-        console.log('user', user);
-        setUserData(user);
-      } catch (error) {
-        console.log(error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    getUserData();
-  }, []);
-
-  if (isLoading) {
+  if (isLoading || isFetching) {
     return (
       <Skeleton
         variant="rounded"
@@ -46,7 +34,7 @@ export const ConversationItem: React.FC<ConversationItemProps> = ({
       />
     );
   }
-
+  console.log('isSuccess', isSuccess);
   return (
     <div
       style={{

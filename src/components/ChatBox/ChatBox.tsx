@@ -2,12 +2,18 @@ import { TextInput } from '@/common/TextInput/TextInput';
 import { socket } from '@/config/socket';
 import { useAuth } from '@/context/AuthContext';
 import { useInterlocutorData } from '@/context/InterlocutorContext';
+import { useMessagesMutation } from '@/hooks/useMessagesMutation';
+import { useMessagesQuery } from '@/hooks/useMessagesQuery';
 import ChatService from '@/services/ChatService';
 import MessageService, {
   AddNewMessageRequest,
 } from '@/services/MessageService';
 import { Message } from '@/types/message';
-import { SOCKET_EMIT_KEYS, SOCKET_ON_KEYS } from '@/types/socket';
+import {
+  ReceiveOrSendMessageInterface,
+  SOCKET_EMIT_KEYS,
+  SOCKET_ON_KEYS,
+} from '@/types/socket';
 import { styled } from '@mui/material';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState, memo } from 'react';
@@ -27,59 +33,18 @@ const ContainerChat = styled('div')(({ theme }) => ({
 
 const ChatBox = memo(() => {
   const queryClient = useQueryClient();
-  const route = useRouter();
   const { user } = useAuth();
-  const { interlocutorData, selectedChat, handleSelectedChat } =
-    useInterlocutorData();
-  const mutation = useMutation(
-    (newMessage: AddNewMessageRequest) =>
-      MessageService.addNewMessage(newMessage),
-    {
-      onSuccess: async (fetchedMessageData) => {
-        if (!fetchedMessageData?.isNewChatCreated) return;
-        route.push({
-          query: {
-            chatId: fetchedMessageData.message.chatId,
-          },
-        });
-        const currentChat = await ChatService.getChatById(
-          fetchedMessageData.message.chatId ?? ''
-        );
+  const { interlocutorData, selectedChat } = useInterlocutorData();
+  const mutation = useMessagesMutation();
+  const { messages, setMessages } = useMessagesQuery(selectedChat?._id ?? '');
 
-        if (!currentChat) return;
-
-        handleSelectedChat(currentChat);
-
-        queryClient.invalidateQueries(ChatService.uniqueName);
-      },
-    }
-  );
-  const [messages, setMessages] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (!selectedChat) {
-      setMessages([]);
-
-      return;
-    }
-
-    const fetchMessages = async () => {
-      try {
-        const messages = await MessageService.getAllMessageByChatId(
-          selectedChat._id
-        );
-        if (!messages) return;
-
-        setMessages(messages);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    fetchMessages();
-  }, [selectedChat]);
-
-  const handleSend = async (text: string) => {
+  const handleSend = async (data: {
+    text: string;
+    files: {
+      base64Url: string;
+      id: string;
+    }[];
+  }) => {
     if (!user) return;
     if (!interlocutorData) return;
 
@@ -88,7 +53,8 @@ const ChatBox = memo(() => {
       receiverId: interlocutorData._id,
       chatId: selectedChat?._id ?? null,
       authorName: `${user.name} ${user.surname}`,
-      text,
+      text: data.text,
+      files: data.files,
     };
     const receiverId =
       selectedChat?.members?.find((id: any) => id !== user._id) ??
@@ -106,17 +72,20 @@ const ChatBox = memo(() => {
     });
   };
 
+  const handleReceivedMessage = async (
+    receivedMessage: ReceiveOrSendMessageInterface
+  ) => {
+    if (!selectedChat) {
+      queryClient.invalidateQueries(ChatService.uniqueName);
+    }
+
+    if (receivedMessage.chatId !== selectedChat?._id) return;
+
+    setMessages([...messages, receivedMessage]);
+  };
+
   useEffect(() => {
-    socket.on(SOCKET_ON_KEYS['RECEIVE:MESSAGE'], async (receivedMessage) => {
-      console.log('receivedMessage', receivedMessage);
-      if (!selectedChat) {
-        queryClient.invalidateQueries(ChatService.uniqueName);
-      }
-
-      if (receivedMessage.chatId !== selectedChat?._id) return;
-
-      setMessages([...messages, receivedMessage]);
-    });
+    socket.on(SOCKET_ON_KEYS['RECEIVE:MESSAGE'], handleReceivedMessage);
   }, [selectedChat, messages]);
 
   return (

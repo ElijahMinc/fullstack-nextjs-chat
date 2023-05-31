@@ -1,38 +1,46 @@
+import { useInterlocutorData } from '@/context/InterlocutorContext';
 import ChatService from '@/services/ChatService';
-import { Chat } from '@/types/conversations';
-import { User } from '@/types/user';
-import { getUserIdsFromMembers } from '@/utils/getUserIdsFromMembers';
-import { useState } from 'react';
-import { useQuery } from 'react-query';
+import MessageService, {
+  AddNewMessageRequest,
+} from '@/services/MessageService';
+import { useRouter } from 'next/router';
+import { useMutation, useQueryClient } from 'react-query';
 
-export const useMessagesMutation = (userId: User['_id']) => {
-  const [addedUserIds, setAddedUserIds] = useState<User['_id'][]>([]);
-  const [chats, setChats] = useState<Chat[]>([]);
+export const useMessagesMutation = () => {
+  const queryClient = useQueryClient();
+  const route = useRouter();
 
-  const {
-    isLoading,
-    isSuccess,
-    isError,
-    refetch: refetchChats,
-  } = useQuery(
-    [ChatService.uniqueName],
-    () => ChatService.getChatsByUserId(userId),
+  const { handleSelectedChat } = useInterlocutorData();
+
+  const mutation = useMutation(
+    (newMessage: AddNewMessageRequest) =>
+      MessageService.addNewMessage(newMessage),
     {
-      onSuccess: (chatsByUserId) => {
-        if (!chatsByUserId) return;
+      onSuccess: async (fetchedMessageData) => {
+        if (!fetchedMessageData?.isNewChatCreated) return;
+        if (!fetchedMessageData.message.chatId) return;
 
-        setChats(chatsByUserId);
-        setAddedUserIds(getUserIdsFromMembers(chatsByUserId, userId));
+        route.push({
+          query: {
+            chatId: fetchedMessageData.message.chatId,
+          },
+        });
+
+        const currentChat = await ChatService.getChatById(
+          fetchedMessageData.message.chatId
+        );
+
+        if (!currentChat) {
+          handleSelectedChat(null);
+          return;
+        }
+
+        handleSelectedChat(currentChat);
+
+        queryClient.invalidateQueries(ChatService.uniqueName);
       },
     }
   );
 
-  return {
-    chats,
-    addedUserIds,
-    refetchChats,
-    isLoading,
-    isSuccess,
-    isError,
-  };
+  return mutation;
 };
